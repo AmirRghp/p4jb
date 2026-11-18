@@ -7,6 +7,9 @@ All notable changes to `p4jb` will be documented in this file.
 ## [Unreleased]
 
 ### Changed
+- Added `Designed by : Tanin` heading using `.brand-tanin` above the `Special Thanks to:` footer in `g2all/index.html`.
+- Renamed the root `GoldHEN Multi FW` button in `index.html` to `5.05 to 14.02 FW`.
+- Styled `TANIN` credit in root `index.html` with `.brand-tanin` in `style.css` (crimson-to-cyan gradient, tracking, underline, and glow) and changed `@GamerHack93` link color to `#ffffff`.
 - Synced upstream `GamerHack/GamerHack.github.io` (`upstream/main` @ `6017271`) into `p4jb` via `upstream-main` while preserving all local customizations (`bg-video.js`, `style.css` video layer, `index.html` `histlength` fix, static dev server, tests, and `/docs`):
   - Updated GoldHEN across `505/`, `672/`, `672goldhen/`, `900goldhen/`, `900v3/`, and `g2all/` from `v2.4b18.13` to `v2.4b18.14` (`goldhen_2.4b18.14.bin`).
   - Extended `g2all/` auto-host firmware support through `14.02`, updated `g2all/slopkit/` (`chain_lapse.js` for `11.50`–`11.52`, unified `jb.js` for `12.00`–`14.02`), removed obsolete `chain_poops.js` / `jb2.js`, and added `1202.bin`, `1252.bin`, `1304.bin`, and `1402.bin` patches.
