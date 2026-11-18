@@ -58,16 +58,14 @@ flowchart LR
    - `7.00`–`8.52` → `700/alert.js` (`type="module"`)
    - `9.00`–`9.60` → `900/alert.js` (`type="module"`)
    - `10.00`–`11.02` → `css/main.js` (calls `doJb()` after `500ms`)
-   - `11.50`–`12.02` → `slopkit/chain_lapse.js` (`type="module"`)
-   - `12.50`–`13.00` → `slopkit/chain_poops.js` (`type="module"`)
-   - `13.02`–`13.52` → `slopkit/jb.js?v=19` (`type="module"`)
-   - `14.00` → `slopkit/jb2.js` (`type="module"`)
-5. Exploit runs kernel jailbreak and loads `goldhen_2.4b18.13.bin`.
+   - `11.50`–`11.52` → `slopkit/chain_lapse.js` (`type="module"`)
+   - `12.00`–`14.02` → `slopkit/jb.js` (`type="module"`)
+5. Exploit runs kernel jailbreak and loads `goldhen_2.4b18.14.bin`.
 
-- **Loading State:** `#msgs` displays `"Loading GoldHEN v2.4b18.13... Please Wait"`.
-- **Success:** `#msgs` updates to `"GoldHEN v2.4b18.13 Loaded ..."` (or `"GoldHEN is Already Loaded ..."` if `setuid(0)` succeeds in `css/main.js`).
+- **Loading State:** `#msgs` displays `"Loading GoldHEN v2.4b18.14... Please Wait"`.
+- **Success:** `#msgs` updates to `"GoldHEN v2.4b18.14 Loaded ..."` (or `"GoldHEN is Already Loaded ..."` if `setuid(0)` succeeds in `css/main.js`).
 - **Error States:**
-  - Non-PS4 browser: `"Only for PS4 with Firmware 5.05 and 7.00 to 14.00"`.
+  - Non-PS4 browser: `"Only for PS4 with Firmware 5.05 and 7.00 to 14.02"`.
   - Unsupported PS4 FW (e.g., `6.72` or gap versions): `"Unsupported Firmware: <version>"` (version in red).
   - Missing script (`script.onerror`): `"Content not Found! - Clear Browser Data and Re-Install Cache ..."`.
   - Exploit failure (`slopkit` / `css`): `"Failed to Load! Restart Your Console ..."` in yellow.
@@ -80,7 +78,7 @@ flowchart LR
 2. After cache verification, the page displays `#progress` (`"Loading... Please Wait"` / `"Loading Jailbreak... Please Wait"`) and executes the WebKit/kernel exploit on `onload` (`setTimeout(..., 50)`).
 3. On exploit completion (`success()`), `#progress` is hidden (`display: none`) and `#menu` becomes visible (`display: block`).
 4. User hovers over payload buttons; top header `#msgs` previews the payload description (`onmouseover`) and resets on `onmouseout`.
-5. User clicks a payload button (e.g., `GoldHEN v2.4b18.13`, `FTP`, `App2USB`, or selects `tempC` and clicks `Fan Threshold`).
+5. User clicks a payload button (e.g., `GoldHEN v2.4b18.14`, `FTP`, `App2USB`, or selects `tempC` and clicks `Fan Threshold`).
    - Optionally opens submenus: `Games-Mods` (`#mods`), `Linux Loaders` (`#lnx`), or navigates to `webactivator.html` (`900v3`).
 6. Page fetches the `.bin` payload via `XMLHttpRequest` (`arraybuffer`), writes it to executable memory, and runs it (`p.fcall` / `pthread_create`).
 

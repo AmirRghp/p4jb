@@ -13,7 +13,7 @@ test('getMimeType returns required MIME types for PS4 host assets', () => {
   assert.equal(getMimeType('g2all/700/alert.js'), 'application/javascript; charset=utf-8');
   assert.equal(getMimeType('g2all/700/module.mjs'), 'application/javascript; charset=utf-8');
   assert.equal(getMimeType('g2all/700.manifest'), 'text/cache-manifest; charset=utf-8');
-  assert.equal(getMimeType('g2all/goldhen_2.4b18.13.bin'), 'application/octet-stream');
+  assert.equal(getMimeType('g2all/goldhen_2.4b18.14.bin'), 'application/octet-stream');
   assert.equal(getMimeType('g2all/700/kpatch/700.elf'), 'application/octet-stream');
   assert.equal(getMimeType('public/assets/aistudio/Tanin1080p_b1930797.webm'), 'video/webm');
   assert.equal(getMimeType('IMG.JPG'), 'image/jpeg');
@@ -86,7 +86,7 @@ test('static handler serves root, assets, manifests, binaries, video ranges, dir
     assert.equal(assetFallbackRes.status, 200);
     assert.equal(assetFallbackRes.headers.get('content-type'), 'video/webm');
 
-    const binRes = await fetch(`${baseUrl}/g2all/goldhen_2.4b18.13.bin`, { method: 'HEAD' });
+    const binRes = await fetch(`${baseUrl}/g2all/goldhen_2.4b18.14.bin`, { method: 'HEAD' });
     assert.equal(binRes.status, 200);
     assert.equal(binRes.headers.get('content-type'), 'application/octet-stream');
     assert.ok(Number(binRes.headers.get('content-length')) > 0);

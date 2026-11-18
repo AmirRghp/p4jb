@@ -4,7 +4,7 @@
 
 **Project:** `p4jb` (Personal Fork of `GamerHack/GamerHack.github.io`)
 
-**Purpose:** Static, offline-capable PlayStation 4 Exploit Host serving WebKit/kernel jailbreaks, GoldHEN, and utility/game-mod payloads across PS4 firmware `5.05`, `6.72`, and `7.00`–`14.00`, plus User's Guide restore utilities.
+**Purpose:** Static, offline-capable PlayStation 4 Exploit Host serving WebKit/kernel jailbreaks, GoldHEN, and utility/game-mod payloads across PS4 firmware `5.05`, `6.72`, and `7.00`–`14.02`, plus User's Guide restore utilities.
 
 **Primary Users:**
 - PS4 console owners accessing the host via the PS4 WebKit Browser (online for initial cache installation, then offline).

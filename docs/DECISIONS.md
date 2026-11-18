@@ -9,7 +9,7 @@
 - **Title:** Maintain Pure Static Architecture (No Build Pipeline or SPA Framework)
 - **Date:** 2026-11-13
 - **Status:** Accepted
-- **Context:** When customizing a forked web project, developers often introduce Node/Vite/React build steps. However, this project targets PlayStation 4 WebKit browsers ranging from firmware `5.05` (older WebKit) up to `14.00` and relies on direct static file serving with HTML5 AppCache.
+- **Context:** When customizing a forked web project, developers often introduce Node/Vite/React build steps. However, this project targets PlayStation 4 WebKit browsers ranging from firmware `5.05` (older WebKit) up to `14.02` and relies on direct static file serving with HTML5 AppCache.
 - **Decision:** Keep `p4jb` as a pure static HTML5 + CSS3 + Vanilla JS application with zero build step and zero runtime external dependencies.
 - **Alternatives:**
   - Introduce Vite/Webpack bundler or React/Tailwind build pipeline.

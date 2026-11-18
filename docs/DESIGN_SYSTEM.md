@@ -23,7 +23,7 @@
   - `public/assets/aistudio/Tanin1080p_b1930797.webm` — Full-viewport fixed looping background video injected across root and all sub-hosts via `bg-video.js` (`#p4jb-bg-layer`, `#p4jb-bg-video`, `.p4jb-bg-scrim`).
   - `img.jpg` — Full-viewport fixed fallback background image (`../img.jpg`) shown if the video is loading or unsupported.
   - `btc.jpg`, `eth.jpg` — `150px × 150px` QR code images inside `#crypto` on `index.html`.
-- **Brand Voice:** Concise, imperative, console-status messaging (e.g., `"Select Your Firmware"`, `"Loading GoldHEN v2.4b18.13... Please Wait"`, `"Cache Installed Successfully ✔"`).
+- **Brand Voice:** Concise, imperative, console-status messaging (e.g., `"Select Your Firmware"`, `"Loading GoldHEN v2.4b18.14... Please Wait"`, `"Cache Installed Successfully ✔"`).
 
 ---
 
@@ -134,9 +134,9 @@ Pages use simple `display: block` / `display: none` section `<div>` containers t
 
 ## 12. States
 
-- **Loading:** `#progress` visible with `#msgs2` (`30px` white text, e.g., `"Loading... Please Wait"`, `"Loading GoldHEN v2.4b18.13... Please Wait"`).
+- **Loading:** `#progress` visible with `#msgs2` (`30px` white text, e.g., `"Loading... Please Wait"`, `"Loading GoldHEN v2.4b18.14... Please Wait"`).
 - **Cache Installing:** `#msgs` updates dynamically with `"Installing Offline Cache: <N>%"`.
-- **Success:** `#msgs` displays `"Cache Installed Successfully ✔"` (followed by `"Now Close And Re-Open Your Browser ..."`), `"GoldHEN v2.4b18.13 Loaded ..."`, or `"<Payload> Loaded ✔"`.
+- **Success:** `#msgs` displays `"Cache Installed Successfully ✔"` (followed by `"Now Close And Re-Open Your Browser ..."`), `"GoldHEN v2.4b18.14 Loaded ..."`, or `"<Payload> Loaded ✔"`.
 - **Error:**
   - Cache error: `"Error Installing Cache! - Clear and Re-Open Your Browser ..."`
   - Missing cached script: `"Content not Found! - Clear Browser Data and Re-Install Cache ..."`
@@ -148,7 +148,7 @@ Pages use simple `display: block` / `display: none` section `<div>` containers t
 ## 13. Icons
 
 - **Icon Library:** None.
-- **Usage:** Unicode checkmark `✔` used inline in status strings (`"Cache Installed Successfully ✔"`, `"GoldHEN v2.4b18.13 Loaded ✔"`).
+- **Usage:** Unicode checkmark `✔` used inline in status strings (`"Cache Installed Successfully ✔"`, `"GoldHEN v2.4b18.14 Loaded ✔"`).
 
 ---
 

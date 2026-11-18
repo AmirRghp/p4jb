@@ -8,7 +8,7 @@
 
 Critical functionality that must be verified before merging changes to `main`:
 - Root navigation (`index.html`) and all sub-host links resolve without 404s.
-- `g2all/index.html` routes every supported PS4 User-Agent firmware string (`5.05`–`14.00`) and non-PS4 User-Agent correctly.
+- `g2all/index.html` routes every supported PS4 User-Agent firmware string (`5.05`–`14.02`) and non-PS4 User-Agent correctly.
 - Every `*.manifest` file lists valid, case-exact paths to existing local files (and flags backslash/missing-file bugs).
 - UI layout (`style.css`, `#menu`, `#progress`, `#mods`, `#lnx`, `#crypto`) fits within `720p`/`1080p` PS4 viewports without clipped buttons under `overflow: hidden`.
 - Offline caching and payload loading succeed on target PS4 hardware when exploit/cache files are touched.
@@ -28,12 +28,12 @@ Verify:
 Verify:
 - Serve the repo over local HTTP (do **not** test via `file://`, because ES Modules and XHR/`fetch` fail under `file://` CORS rules).
 - Spoof `navigator.userAgent` in DevTools (Network Conditions / User-Agent override) to test `g2all/index.html` routing for:
-  - Desktop UA → `"Only for PS4 with Firmware 5.05 and 7.00 to 14.00"`
+  - Desktop UA → `"Only for PS4 with Firmware 5.05 and 7.00 to 14.02"`
   - `Mozilla/5.0 (PlayStation 4 5.05) AppleWebKit/601.2 (KHTML, like Gecko)`
   - `Mozilla/5.0 (PlayStation 4 9.00) AppleWebKit/605.1.15 (KHTML, like Gecko)`
   - `Mozilla/5.0 (PlayStation 4 11.00) AppleWebKit/605.1.15 (KHTML, like Gecko)`
   - `Mozilla/5.0 (PlayStation 4 12.50) AppleWebKit/605.1.15 (KHTML, like Gecko)`
-  - `Mozilla/5.0 (PlayStation 4 14.00) AppleWebKit/605.1.15 (KHTML, like Gecko)`
+  - `Mozilla/5.0 (PlayStation 4 14.02) AppleWebKit/605.1.15 (KHTML, like Gecko)`
   - Unsupported FW e.g., `6.72` on `g2all/` → `"Unsupported Firmware: 6.72"`
 - Verify Network tab shows `200 OK` (no `404`) for routed scripts and CSS.
 
@@ -74,7 +74,7 @@ tests/            # Optional future validation scripts (not deployed to AppCache
   - **Expected Result:** All links resolve (`200 OK`) and `#menu` / `#crypto` toggle cleanly.
 
 - **Flow: `g2all` UA Dispatch**
-  1. Open `/g2all/index.html` with spoofed PS4 UAs (`5.05`, `7.55`, `9.00`, `11.00`, `12.00`, `12.50`, `13.50`, `14.00`, and `6.72`).
+  1. Open `/g2all/index.html` with spoofed PS4 UAs (`5.05`, `7.55`, `9.00`, `11.00`, `12.00`, `12.50`, `13.50`, `14.02`, and `6.72`).
   - **Expected Result:** Each valid firmware redirects to its expected `cache*.html` (when uncached) or requests its expected exploit script; `6.72` shows `Unsupported Firmware`.
 
 - **Flow: Manifest Integrity**
