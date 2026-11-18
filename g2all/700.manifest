@@ -1,10 +1,12 @@
 CACHE MANIFEST
-# bg-video v2
+# bg-video v3
 
 CACHE: 
 ../style.css
 ../bg-video.js
 ../public/assets/aistudio/Tanin1080p_b1930797.webm
+../public/assets/aistudio/tanin-bg.mp4
+../public/assets/aistudio/tanin-poster.jpg
 goldhen_2.4b18.14.bin
 index.html
 700\alert.js

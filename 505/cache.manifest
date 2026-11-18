@@ -1,9 +1,11 @@
 CACHE MANIFEST
-# bg-video v2
+# bg-video v3
 
 ../style.css
 ../bg-video.js
 ../public/assets/aistudio/Tanin1080p_b1930797.webm
+../public/assets/aistudio/tanin-bg.mp4
+../public/assets/aistudio/tanin-poster.jpg
 app2usb.bin
 arabic-guy100.bin
 arabic-guy127.bin

@@ -27,9 +27,58 @@ const MIME_TYPES: Record<string, string> = {
   '.woff2': 'font/woff2',
 };
 
+const CACHEABLE_MEDIA_EXTS = new Set([
+  '.webm',
+  '.mp4',
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.gif',
+  '.svg',
+  '.ico',
+  '.bin',
+  '.elf',
+  '.woff',
+  '.woff2',
+]);
+
 export function getMimeType(filePath: string): string {
   const ext = path.extname(filePath).toLowerCase();
   return MIME_TYPES[ext] ?? 'application/octet-stream';
+}
+
+export function getCacheControl(filePath: string): string {
+  const ext = path.extname(filePath).toLowerCase();
+  return CACHEABLE_MEDIA_EXTS.has(ext) ? 'public, max-age=3600' : 'no-cache';
+}
+
+export function buildEtag(stat: fs.Stats): string {
+  return `W/"${stat.size}-${Math.trunc(stat.mtimeMs)}"`;
+}
+
+function isClientCacheFresh(req: IncomingMessage, etag: string, mtimeMs: number): boolean {
+  const ifNoneMatch = req.headers['if-none-match'];
+  if (typeof ifNoneMatch === 'string' && ifNoneMatch.trim() !== '') {
+    const normalizedTarget = etag.replace(/^W\//i, '');
+    const tags = ifNoneMatch.split(',');
+    for (const rawTag of tags) {
+      const tag = rawTag.trim();
+      if (tag === '*' || tag === etag || tag.replace(/^W\//i, '') === normalizedTarget) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  const ifModifiedSince = req.headers['if-modified-since'];
+  if (typeof ifModifiedSince === 'string' && ifModifiedSince.trim() !== '') {
+    const parsedTime = Date.parse(ifModifiedSince);
+    if (!Number.isNaN(parsedTime) && Math.floor(mtimeMs / 1000) <= Math.floor(parsedTime / 1000)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export function resolveSafePath(rootDir: string, urlPathname: string): string | null {
@@ -172,7 +221,21 @@ export function createStaticHandler(rootDir: string) {
     }
 
     const mimeType = getMimeType(targetPath);
+    const cacheControl = getCacheControl(targetPath);
+    const etag = buildEtag(stat);
+    const lastModified = stat.mtime.toUTCString();
     const rangeHeader = typeof req.headers.range === 'string' ? req.headers.range : undefined;
+
+    if (!rangeHeader && isClientCacheFresh(req, etag, stat.mtimeMs)) {
+      res.writeHead(304, {
+        ETag: etag,
+        'Last-Modified': lastModified,
+        'Cache-Control': cacheControl,
+      });
+      res.end();
+      return;
+    }
+
     const range = parseRangeHeader(rangeHeader, stat.size);
 
     if (range === 'invalid') {
@@ -190,7 +253,9 @@ export function createStaticHandler(rootDir: string) {
         'Content-Length': chunkLength,
         'Content-Range': `bytes ${range.start}-${range.end}/${stat.size}`,
         'Accept-Ranges': 'bytes',
-        'Cache-Control': 'no-cache',
+        ETag: etag,
+        'Last-Modified': lastModified,
+        'Cache-Control': cacheControl,
       });
 
       if (method === 'HEAD') {
@@ -214,7 +279,9 @@ export function createStaticHandler(rootDir: string) {
       'Content-Type': mimeType,
       'Content-Length': stat.size,
       'Accept-Ranges': 'bytes',
-      'Cache-Control': 'no-cache',
+      ETag: etag,
+      'Last-Modified': lastModified,
+      'Cache-Control': cacheControl,
     });
 
     if (method === 'HEAD') {

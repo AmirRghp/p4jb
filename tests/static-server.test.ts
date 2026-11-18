@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import path from 'node:path';
 import type { AddressInfo } from 'node:net';
-import { createStaticHandler, getMimeType, parseRangeHeader, resolveSafePath } from '../lib/static-server.ts';
+import { buildEtag, createStaticHandler, getCacheControl, getMimeType, parseRangeHeader, resolveSafePath } from '../lib/static-server.ts';
 
 const ROOT_DIR = path.resolve(process.cwd());
 
@@ -16,7 +16,25 @@ test('getMimeType returns required MIME types for PS4 host assets', () => {
   assert.equal(getMimeType('g2all/goldhen_2.4b18.14.bin'), 'application/octet-stream');
   assert.equal(getMimeType('g2all/700/kpatch/700.elf'), 'application/octet-stream');
   assert.equal(getMimeType('public/assets/aistudio/Tanin1080p_b1930797.webm'), 'video/webm');
+  assert.equal(getMimeType('public/assets/aistudio/tanin-bg.mp4'), 'video/mp4');
+  assert.equal(getMimeType('public/assets/aistudio/tanin-poster.jpg'), 'image/jpeg');
   assert.equal(getMimeType('IMG.JPG'), 'image/jpeg');
+});
+
+test('getCacheControl distinguishes media/binaries from HTML, JS, CSS, and manifests', () => {
+  assert.equal(getCacheControl('public/assets/aistudio/Tanin1080p_b1930797.webm'), 'public, max-age=3600');
+  assert.equal(getCacheControl('public/assets/aistudio/tanin-bg.mp4'), 'public, max-age=3600');
+  assert.equal(getCacheControl('public/assets/aistudio/tanin-poster.jpg'), 'public, max-age=3600');
+  assert.equal(getCacheControl('g2all/goldhen_2.4b18.14.bin'), 'public, max-age=3600');
+  assert.equal(getCacheControl('index.html'), 'no-cache');
+  assert.equal(getCacheControl('bg-video.js'), 'no-cache');
+  assert.equal(getCacheControl('style.css'), 'no-cache');
+  assert.equal(getCacheControl('505/cache.manifest'), 'no-cache');
+});
+
+test('buildEtag produces stable weak ETags from stat size and mtimeMs', () => {
+  const etag = buildEtag({ size: 1024, mtimeMs: 1700000000123.9 } as any);
+  assert.equal(etag, 'W/"1024-1700000000123"');
 });
 
 test('parseRangeHeader handles byte ranges and rejects invalid ranges', () => {
@@ -53,17 +71,20 @@ async function withServer(fn: (baseUrl: string) => Promise<void>): Promise<void>
   }
 }
 
-test('static handler serves root, assets, manifests, binaries, video ranges, directory redirects, and 404/403', async () => {
+test('static handler serves root, assets, manifests, binaries, video ranges, ETags/304, directory redirects, and 404/403', async () => {
   await withServer(async (baseUrl) => {
     const rootRes = await fetch(`${baseUrl}/`);
     assert.equal(rootRes.status, 200);
     assert.equal(rootRes.headers.get('content-type'), 'text/html; charset=utf-8');
+    assert.equal(rootRes.headers.get('cache-control'), 'no-cache');
+    assert.ok(rootRes.headers.get('etag'));
     const rootHtml = await rootRes.text();
     assert.match(rootHtml, /PS4\s+Exploit Host by GamerHack/);
 
     const cssRes = await fetch(`${baseUrl}/style.css`);
     assert.equal(cssRes.status, 200);
     assert.equal(cssRes.headers.get('content-type'), 'text/css; charset=utf-8');
+    assert.equal(cssRes.headers.get('cache-control'), 'no-cache');
 
     const manifestRes = await fetch(`${baseUrl}/g2all/700.manifest`);
     assert.equal(manifestRes.status, 200);
@@ -79,16 +100,39 @@ test('static handler serves root, assets, manifests, binaries, video ranges, dir
     assert.equal(videoRangeRes.status, 206);
     assert.equal(videoRangeRes.headers.get('content-type'), 'video/webm');
     assert.equal(videoRangeRes.headers.get('content-length'), '1024');
+    assert.equal(videoRangeRes.headers.get('cache-control'), 'public, max-age=3600');
+
+    const mp4RangeRes = await fetch(`${baseUrl}/public/assets/aistudio/tanin-bg.mp4`, {
+      headers: { Range: 'bytes=0-1023' },
+    });
+    assert.equal(mp4RangeRes.status, 206);
+    assert.equal(mp4RangeRes.headers.get('content-type'), 'video/mp4');
+    assert.equal(mp4RangeRes.headers.get('cache-control'), 'public, max-age=3600');
+
+    const posterRes = await fetch(`${baseUrl}/public/assets/aistudio/tanin-poster.jpg`);
+    assert.equal(posterRes.status, 200);
+    assert.equal(posterRes.headers.get('content-type'), 'image/jpeg');
+    assert.equal(posterRes.headers.get('cache-control'), 'public, max-age=3600');
+    const posterEtag = posterRes.headers.get('etag');
+    assert.ok(posterEtag);
+
+    const conditionalRes = await fetch(`${baseUrl}/public/assets/aistudio/tanin-poster.jpg`, {
+      headers: { 'If-None-Match': posterEtag },
+    });
+    assert.equal(conditionalRes.status, 304);
+    assert.equal(conditionalRes.headers.get('etag'), posterEtag);
 
     const assetFallbackRes = await fetch(`${baseUrl}/assets/aistudio/Tanin1080p_b1930797.webm`, {
       method: 'HEAD',
     });
     assert.equal(assetFallbackRes.status, 200);
     assert.equal(assetFallbackRes.headers.get('content-type'), 'video/webm');
+    assert.equal(assetFallbackRes.headers.get('cache-control'), 'public, max-age=3600');
 
     const binRes = await fetch(`${baseUrl}/g2all/goldhen_2.4b18.14.bin`, { method: 'HEAD' });
     assert.equal(binRes.status, 200);
     assert.equal(binRes.headers.get('content-type'), 'application/octet-stream');
+    assert.equal(binRes.headers.get('cache-control'), 'public, max-age=3600');
     assert.ok(Number(binRes.headers.get('content-length')) > 0);
 
     const dirRedirectRes = await fetch(`${baseUrl}/505`, { redirect: 'manual' });

@@ -9,7 +9,7 @@
 - **Style:** Dark, high-contrast, TV-centric console utility interface.
 - **Mood:** Technical, direct, retro-console dashboard designed for viewing from a couch on a television screen via the PS4 browser.
 - **Design Principles:**
-  - High contrast white text with dark drop shadows over a looping full-screen background video (`public/assets/aistudio/Tanin1080p_b1930797.webm`, with solid dark `#0a0c12` fallback and a subtle dark scrim `.p4jb-bg-scrim` for readability).
+  - High contrast white text with dark drop shadows over a looping full-screen background video (`public/assets/aistudio/Tanin1080p_b1930797.webm` VP9 + `public/assets/aistudio/tanin-bg.mp4` H.264 fallback + `public/assets/aistudio/tanin-poster.jpg` first-frame poster, with solid dark `#0a0c12` fallback and a subtle dark scrim `.p4jb-bg-scrim` for readability).
   - Large, uniform rectangular hit targets optimized for DualShock 4 analog-stick cursor navigation.
   - Zero external font or icon network dependencies so the entire UI renders identically offline.
   - Immediate single-line status feedback (`#msgs`) on button hover and exploit progress.
@@ -20,7 +20,7 @@
 
 - **Current Baseline Name:** `PS4 Exploit Host by GamerHack` (to be updated when `p4jb` custom branding is applied).
 - **Logo / Imagery:**
-  - `public/assets/aistudio/Tanin1080p_b1930797.webm` — Full-viewport fixed looping background video injected across root and all sub-hosts via `bg-video.js` (`#p4jb-bg-layer`, `#p4jb-bg-video`, `.p4jb-bg-scrim`).
+  - `public/assets/aistudio/Tanin1080p_b1930797.webm` (1080p VP9, audio-stripped), `public/assets/aistudio/tanin-bg.mp4` (720p H.264 `+faststart` fallback for Safari/PS4 WebKit), and `public/assets/aistudio/tanin-poster.jpg` (720p first-frame poster) — Full-viewport fixed looping background layer injected across root and all sub-hosts via `bg-video.js` and `style.css` (`#p4jb-bg-layer`, `#p4jb-bg-video`, `.p4jb-bg-scrim`), featuring `canPlayType` codec selection, GPU layer isolation (`translateZ(0)`, `contain: strict`), smooth opacity reveal, `visibilitychange` pause/resume, and `prefers-reduced-motion` support.
   - `btc.jpg`, `eth.jpg` — `150px × 150px` QR code images inside `#crypto` on `index.html`.
 - **Brand Voice:** Concise, imperative, console-status messaging (e.g., `"Select Your Firmware"`, `"Loading GoldHEN v2.4b18.14... Please Wait"`, `"Cache Installed Successfully ✔"`).
 
@@ -32,7 +32,7 @@ All color tokens below are extracted directly from `style.css` and inline HTML a
 
 | Role | Value | Usage |
 | :--- | :--- | :--- |
-| **Background Fallback** | `#0a0c12` | `html { background-color: #0a0c12; }` while the background video loads or if unsupported |
+| **Background Fallback** | `#0a0c12` | `html` and `#p4jb-bg-layer` solid fallback color beneath `tanin-poster.jpg` and the background video |
 | **Primary Button** | `#003263` | Default `.btn` fill (deep navy blue) |
 | **Primary Button Hover** | `#0069d9` | `.btn:hover` fill (bright blue) |
 | **Multi-FW Highlight Button** | `#b8860b` | `.btn-multi` fill (dark goldenrod for `GoldHEN Multi FW`) |
