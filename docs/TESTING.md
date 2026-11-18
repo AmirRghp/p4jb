@@ -70,8 +70,7 @@ tests/            # Optional future validation scripts (not deployed to AppCache
 - **Flow: Root Menu Navigation**
   1. Open `/index.html` over HTTP.
   2. Hover each button and verify `#msgs` updates and resets on mouseout.
-  3. Toggle `For Donations` and click `Return`.
-  - **Expected Result:** All links resolve (`200 OK`) and `#menu` / `#crypto` toggle cleanly.
+  - **Expected Result:** All 7 host/restore links resolve (`200 OK`) and no donations button is rendered.
 
 - **Flow: `g2all` UA Dispatch**
   1. Open `/g2all/index.html` with spoofed PS4 UAs (`5.05`, `7.55`, `9.00`, `11.00`, `12.00`, `12.50`, `13.50`, `14.02`, and `6.72`).

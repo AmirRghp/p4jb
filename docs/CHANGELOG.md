@@ -12,6 +12,9 @@ All notable changes to `p4jb` will be documented in this file.
   - Extended `g2all/` auto-host firmware support through `14.02`, updated `g2all/slopkit/` (`chain_lapse.js` for `11.50`–`11.52`, unified `jb.js` for `12.00`–`14.02`), removed obsolete `chain_poops.js` / `jb2.js`, and added `1202.bin`, `1252.bin`, `1304.bin`, and `1402.bin` patches.
   - Updated `tests/static-server.test.ts` and `/docs` to reference `goldhen_2.4b18.14.bin` and firmware `14.02`.
 
+### Removed
+- Removed the `For Donations (Only in Cryptocurrencies)` button and `#crypto` view from root `index.html` (adjusting footer `margin-top` to `338px` to preserve vertical layout alignment).
+
 ### Fixed
 - Removed legacy `img.jpg` background image (`style.css`, `bg-video.js` `poster`, all `*.manifest` files, and `img.jpg` file) and switched `html` fallback background to `#0a0c12` (bumping manifests to `# bg-video v2`) so the old controller image no longer flashes before the background video loads.
 - Fixed `Uncaught SyntaxError: missing ) after argument list` in root `index.html` line 8 (`history.go(-histlength);`).
