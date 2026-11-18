@@ -1,8 +1,7 @@
 CACHE MANIFEST
-# bg-video v1
+# bg-video v2
 
 CACHE:
-../img.jpg
 ../style.css
 ../bg-video.js
 ../public/assets/aistudio/Tanin1080p_b1930797.webm
