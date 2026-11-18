@@ -158,7 +158,7 @@ See [DECISIONS.md](DECISIONS.md) for full ADRs covering:
 
 - **Known Baseline Quirk — Backslashes in `g2all/*.manifest`:**
   - `g2all/505.manifest`, `g2all/700.manifest`, `g2all/900.manifest`, `g2all/css.manifest`, and `g2all/slopkit.manifest` currently use Windows backslashes (`\`, e.g., `700\alert.js`) instead of forward slashes (`/`). On strict HTTP/Linux servers (like GitHub Pages) or WebKit URL resolvers, backslashes in manifest URLs can cause 404s during AppCache installation. This is documented as a baseline issue to verify and normalize in a dedicated fix branch.
-- **Root `index.html` Line 8 Typo:**
-  - `var histlength=history.length;history.go(-histlength 2);` (missing `+` or `-` operator before `2`) is present in the upstream baseline.
+- **Root `index.html` Line 8 Typo (Fixed):**
+  - Upstream baseline had `var histlength=history.length;history.go(-histlength 2);` (missing operator before `2`), throwing `Uncaught SyntaxError: missing ) after argument list`. Fixed to `history.go(-histlength);` matching the `cache.html` sub-hosts.
 - **Online-Only Payloads Offline:** Clicking `PS4 Trainer Web` or online Game Mods while offline fails network navigation.
 - **Unlisted Asset in Manifest:** Any new file not listed in `*.manifest` will fail with `onScriptError()` or missing payload when offline.

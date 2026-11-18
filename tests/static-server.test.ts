@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import path from 'node:path';
 import type { AddressInfo } from 'node:net';
-import { createStaticHandler, getMimeType, resolveSafePath } from '../lib/static-server.ts';
+import { createStaticHandler, getMimeType, parseRangeHeader, resolveSafePath } from '../lib/static-server.ts';
 
 const ROOT_DIR = path.resolve(process.cwd());
 
@@ -15,7 +15,17 @@ test('getMimeType returns required MIME types for PS4 host assets', () => {
   assert.equal(getMimeType('g2all/700.manifest'), 'text/cache-manifest; charset=utf-8');
   assert.equal(getMimeType('g2all/goldhen_2.4b18.13.bin'), 'application/octet-stream');
   assert.equal(getMimeType('g2all/700/kpatch/700.elf'), 'application/octet-stream');
+  assert.equal(getMimeType('public/assets/aistudio/Tanin1080p_b1930797.webm'), 'video/webm');
   assert.equal(getMimeType('IMG.JPG'), 'image/jpeg');
+});
+
+test('parseRangeHeader handles byte ranges and rejects invalid ranges', () => {
+  assert.deepEqual(parseRangeHeader('bytes=0-1023', 2048), { start: 0, end: 1023 });
+  assert.deepEqual(parseRangeHeader('bytes=100-', 2048), { start: 100, end: 2047 });
+  assert.deepEqual(parseRangeHeader('bytes=-512', 2048), { start: 1536, end: 2047 });
+  assert.equal(parseRangeHeader('bytes=5000-6000', 2048), 'invalid');
+  assert.equal(parseRangeHeader('items=0-5', 2048), 'invalid');
+  assert.equal(parseRangeHeader(undefined, 2048), null);
 });
 
 test('resolveSafePath allows valid paths and blocks traversal or malformed URIs', () => {
@@ -43,7 +53,7 @@ async function withServer(fn: (baseUrl: string) => Promise<void>): Promise<void>
   }
 }
 
-test('static handler serves root, assets, manifests, binaries, directory redirects, and 404/403', async () => {
+test('static handler serves root, assets, manifests, binaries, video ranges, directory redirects, and 404/403', async () => {
   await withServer(async (baseUrl) => {
     const rootRes = await fetch(`${baseUrl}/`);
     assert.equal(rootRes.status, 200);
@@ -62,6 +72,19 @@ test('static handler serves root, assets, manifests, binaries, directory redirec
     const jsRes = await fetch(`${baseUrl}/g2all/700/alert.js`);
     assert.equal(jsRes.status, 200);
     assert.equal(jsRes.headers.get('content-type'), 'application/javascript; charset=utf-8');
+
+    const videoRangeRes = await fetch(`${baseUrl}/public/assets/aistudio/Tanin1080p_b1930797.webm`, {
+      headers: { Range: 'bytes=0-1023' },
+    });
+    assert.equal(videoRangeRes.status, 206);
+    assert.equal(videoRangeRes.headers.get('content-type'), 'video/webm');
+    assert.equal(videoRangeRes.headers.get('content-length'), '1024');
+
+    const assetFallbackRes = await fetch(`${baseUrl}/assets/aistudio/Tanin1080p_b1930797.webm`, {
+      method: 'HEAD',
+    });
+    assert.equal(assetFallbackRes.status, 200);
+    assert.equal(assetFallbackRes.headers.get('content-type'), 'video/webm');
 
     const binRes = await fetch(`${baseUrl}/g2all/goldhen_2.4b18.13.bin`, { method: 'HEAD' });
     assert.equal(binRes.status, 200);

@@ -1,7 +1,10 @@
-CACHE MANIFEST 
+CACHE MANIFEST
+# bg-video v1
 
 ../img.jpg
 ../style.css
+../bg-video.js
+../public/assets/aistudio/Tanin1080p_b1930797.webm
 app2usb.bin
 arabic-guy100.bin
 arabic-guy127.bin

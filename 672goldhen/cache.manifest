@@ -1,7 +1,10 @@
-CACHE MANIFEST 
+CACHE MANIFEST
+# bg-video v1
 
 ../img.jpg
-../style.css 
+../style.css
+../bg-video.js
+../public/assets/aistudio/Tanin1080p_b1930797.webm
 exp_loader.js
 goldhen_2.4b18.13.bin
 index.html

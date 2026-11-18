@@ -6,7 +6,11 @@ All notable changes to `p4jb` will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- Fixed `Uncaught SyntaxError: missing ) after argument list` in root `index.html` line 8 (`history.go(-histlength);`).
+
 ### Added
+- Added looping full-viewport background video (`public/assets/aistudio/Tanin1080p_b1930797.webm`) across all host pages via `bg-video.js` and `style.css` (`#p4jb-bg-layer`, `#p4jb-bg-video`, `.p4jb-bg-scrim`), registered in all `*.manifest` offline caches, with HTTP `Range` (`206`) and `video/webm` support in `lib/static-server.ts`.
 - Added zero-dependency Node.js static HTTP dev/preview server (`server.ts`, `lib/static-server.ts`, `package.json`, and `tests/static-server.test.ts`) serving all PS4 host files on port `3000` with proper `.js`/`.mjs`, `.manifest`, and `.bin`/`.elf` MIME types.
 - Created complete project documentation suite following The Vibe Coding Blueprint:
   - Root `AGENTS.md` with AI coding agent rules and mandatory Git/branching constraints.

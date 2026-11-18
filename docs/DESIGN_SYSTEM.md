@@ -9,7 +9,7 @@
 - **Style:** Dark, high-contrast, TV-centric console utility interface.
 - **Mood:** Technical, direct, retro-console dashboard designed for viewing from a couch on a television screen via the PS4 browser.
 - **Design Principles:**
-  - High contrast white text with dark drop shadows over a full-screen background image (`img.jpg`).
+  - High contrast white text with dark drop shadows over a looping full-screen background video (`public/assets/aistudio/Tanin1080p_b1930797.webm`, with `img.jpg` as fallback and a subtle dark scrim `.p4jb-bg-scrim` for readability).
   - Large, uniform rectangular hit targets optimized for DualShock 4 analog-stick cursor navigation.
   - Zero external font or icon network dependencies so the entire UI renders identically offline.
   - Immediate single-line status feedback (`#msgs`) on button hover and exploit progress.
@@ -20,7 +20,8 @@
 
 - **Current Baseline Name:** `PS4 Exploit Host by GamerHack` (to be updated when `p4jb` custom branding is applied).
 - **Logo / Imagery:**
-  - `img.jpg` — Full-viewport fixed background image shared across root and all sub-hosts (`../img.jpg`).
+  - `public/assets/aistudio/Tanin1080p_b1930797.webm` — Full-viewport fixed looping background video injected across root and all sub-hosts via `bg-video.js` (`#p4jb-bg-layer`, `#p4jb-bg-video`, `.p4jb-bg-scrim`).
+  - `img.jpg` — Full-viewport fixed fallback background image (`../img.jpg`) shown if the video is loading or unsupported.
   - `btc.jpg`, `eth.jpg` — `150px × 150px` QR code images inside `#crypto` on `index.html`.
 - **Brand Voice:** Concise, imperative, console-status messaging (e.g., `"Select Your Firmware"`, `"Loading GoldHEN v2.4b18.13... Please Wait"`, `"Cache Installed Successfully ✔"`).
 

@@ -21,6 +21,8 @@ const MIME_TYPES: Record<string, string> = {
   '.ico': 'image/x-icon',
   '.txt': 'text/plain; charset=utf-8',
   '.md': 'text/markdown; charset=utf-8',
+  '.webm': 'video/webm',
+  '.mp4': 'video/mp4',
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
 };
@@ -51,6 +53,39 @@ export function resolveSafePath(rootDir: string, urlPathname: string): string | 
   }
 
   return resolved;
+}
+
+export function parseRangeHeader(
+  rangeHeader: string | undefined,
+  fileSize: number,
+): { start: number; end: number } | 'invalid' | null {
+  if (!rangeHeader) return null;
+  const match = /^bytes=(\d*)-(\d*)$/i.exec(rangeHeader.trim());
+  if (!match) return 'invalid';
+
+  const [, rawStart, rawEnd] = match;
+  if (!rawStart && !rawEnd) return 'invalid';
+
+  if (fileSize === 0) return 'invalid';
+
+  let start: number;
+  let end: number;
+
+  if (!rawStart) {
+    const suffixLength = Number(rawEnd);
+    if (!Number.isFinite(suffixLength) || suffixLength <= 0) return 'invalid';
+    start = Math.max(0, fileSize - suffixLength);
+    end = fileSize - 1;
+  } else {
+    start = Number(rawStart);
+    end = rawEnd ? Number(rawEnd) : fileSize - 1;
+    if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || start >= fileSize || end < start) {
+      return 'invalid';
+    }
+    end = Math.min(end, fileSize - 1);
+  }
+
+  return { start, end };
 }
 
 function sendError(res: ServerResponse, statusCode: number, message: string, method?: string): void {
@@ -91,11 +126,25 @@ export function createStaticHandler(rootDir: string) {
     }
 
     let targetPath = safePath;
-    let stat: fs.Stats;
+    let stat: fs.Stats | null = null;
 
     try {
       stat = await fs.promises.stat(targetPath);
     } catch {
+      if (parsedUrl.pathname.startsWith('/assets/')) {
+        const publicFallback = resolveSafePath(normalizedRoot, `/public${parsedUrl.pathname}`);
+        if (publicFallback) {
+          try {
+            stat = await fs.promises.stat(publicFallback);
+            targetPath = publicFallback;
+          } catch {
+            stat = null;
+          }
+        }
+      }
+    }
+
+    if (!stat) {
       sendError(res, 404, 'Not Found', method);
       return;
     }
@@ -122,9 +171,49 @@ export function createStaticHandler(rootDir: string) {
       return;
     }
 
+    const mimeType = getMimeType(targetPath);
+    const rangeHeader = typeof req.headers.range === 'string' ? req.headers.range : undefined;
+    const range = parseRangeHeader(rangeHeader, stat.size);
+
+    if (range === 'invalid') {
+      res.writeHead(416, {
+        'Content-Range': `bytes */${stat.size}`,
+      });
+      res.end();
+      return;
+    }
+
+    if (range) {
+      const chunkLength = range.end - range.start + 1;
+      res.writeHead(206, {
+        'Content-Type': mimeType,
+        'Content-Length': chunkLength,
+        'Content-Range': `bytes ${range.start}-${range.end}/${stat.size}`,
+        'Accept-Ranges': 'bytes',
+        'Cache-Control': 'no-cache',
+      });
+
+      if (method === 'HEAD') {
+        res.end();
+        return;
+      }
+
+      const stream = fs.createReadStream(targetPath, { start: range.start, end: range.end });
+      stream.on('error', () => {
+        if (!res.headersSent) {
+          sendError(res, 500, 'Internal Server Error', method);
+        } else {
+          res.destroy();
+        }
+      });
+      stream.pipe(res);
+      return;
+    }
+
     res.writeHead(200, {
-      'Content-Type': getMimeType(targetPath),
+      'Content-Type': mimeType,
       'Content-Length': stat.size,
+      'Accept-Ranges': 'bytes',
       'Cache-Control': 'no-cache',
     });
 
