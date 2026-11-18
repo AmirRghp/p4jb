@@ -1,0 +1,103 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import http from 'node:http';
+import path from 'node:path';
+import type { AddressInfo } from 'node:net';
+import { createStaticHandler, getMimeType, resolveSafePath } from '../lib/static-server.ts';
+
+const ROOT_DIR = path.resolve(process.cwd());
+
+test('getMimeType returns required MIME types for PS4 host assets', () => {
+  assert.equal(getMimeType('index.html'), 'text/html; charset=utf-8');
+  assert.equal(getMimeType('style.css'), 'text/css; charset=utf-8');
+  assert.equal(getMimeType('g2all/700/alert.js'), 'application/javascript; charset=utf-8');
+  assert.equal(getMimeType('g2all/700/module.mjs'), 'application/javascript; charset=utf-8');
+  assert.equal(getMimeType('g2all/700.manifest'), 'text/cache-manifest; charset=utf-8');
+  assert.equal(getMimeType('g2all/goldhen_2.4b18.13.bin'), 'application/octet-stream');
+  assert.equal(getMimeType('g2all/700/kpatch/700.elf'), 'application/octet-stream');
+  assert.equal(getMimeType('IMG.JPG'), 'image/jpeg');
+});
+
+test('resolveSafePath allows valid paths and blocks traversal or malformed URIs', () => {
+  assert.equal(resolveSafePath(ROOT_DIR, '/'), ROOT_DIR);
+  assert.equal(resolveSafePath(ROOT_DIR, '/g2all/index.html'), path.join(ROOT_DIR, 'g2all', 'index.html'));
+  assert.equal(resolveSafePath(ROOT_DIR, '/505/cache.manifest'), path.join(ROOT_DIR, '505', 'cache.manifest'));
+  assert.equal(resolveSafePath(ROOT_DIR, '/../etc/passwd'), null);
+  assert.equal(resolveSafePath(ROOT_DIR, '/%2e%2e/etc/passwd'), null);
+  assert.equal(resolveSafePath(ROOT_DIR, '/%E0%A4%A'), null);
+  assert.equal(resolveSafePath(ROOT_DIR, '/index.html\0.txt'), null);
+});
+
+async function withServer(fn: (baseUrl: string) => Promise<void>): Promise<void> {
+  const server = http.createServer(createStaticHandler(ROOT_DIR));
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const address = server.address() as AddressInfo;
+  const baseUrl = `http://127.0.0.1:${address.port}`;
+  try {
+    await fn(baseUrl);
+  } finally {
+    await new Promise<void>((resolve, reject) => {
+      server.close((err) => (err ? reject(err) : resolve()));
+      server.closeAllConnections();
+    });
+  }
+}
+
+test('static handler serves root, assets, manifests, binaries, directory redirects, and 404/403', async () => {
+  await withServer(async (baseUrl) => {
+    const rootRes = await fetch(`${baseUrl}/`);
+    assert.equal(rootRes.status, 200);
+    assert.equal(rootRes.headers.get('content-type'), 'text/html; charset=utf-8');
+    const rootHtml = await rootRes.text();
+    assert.match(rootHtml, /PS4\s+Exploit Host by GamerHack/);
+
+    const cssRes = await fetch(`${baseUrl}/style.css`);
+    assert.equal(cssRes.status, 200);
+    assert.equal(cssRes.headers.get('content-type'), 'text/css; charset=utf-8');
+
+    const manifestRes = await fetch(`${baseUrl}/g2all/700.manifest`);
+    assert.equal(manifestRes.status, 200);
+    assert.equal(manifestRes.headers.get('content-type'), 'text/cache-manifest; charset=utf-8');
+
+    const jsRes = await fetch(`${baseUrl}/g2all/700/alert.js`);
+    assert.equal(jsRes.status, 200);
+    assert.equal(jsRes.headers.get('content-type'), 'application/javascript; charset=utf-8');
+
+    const binRes = await fetch(`${baseUrl}/g2all/goldhen_2.4b18.13.bin`, { method: 'HEAD' });
+    assert.equal(binRes.status, 200);
+    assert.equal(binRes.headers.get('content-type'), 'application/octet-stream');
+    assert.ok(Number(binRes.headers.get('content-length')) > 0);
+
+    const dirRedirectRes = await fetch(`${baseUrl}/505`, { redirect: 'manual' });
+    assert.equal(dirRedirectRes.status, 301);
+    assert.equal(dirRedirectRes.headers.get('location'), '/505/');
+
+    const subHostRes = await fetch(`${baseUrl}/505/`);
+    assert.equal(subHostRes.status, 200);
+    assert.equal(subHostRes.headers.get('content-type'), 'text/html; charset=utf-8');
+
+    const missingRes = await fetch(`${baseUrl}/does-not-exist-12345`);
+    assert.equal(missingRes.status, 404);
+
+    const port = Number(new URL(baseUrl).port);
+    const traversalStatus = await new Promise<number>((resolve, reject) => {
+      http
+        .get({ hostname: '127.0.0.1', port, path: '/%2e%2e/etc/passwd' }, (res) => {
+          res.resume();
+          resolve(res.statusCode ?? 0);
+        })
+        .on('error', reject);
+    });
+    assert.equal(traversalStatus, 404);
+
+    const malformedStatus = await new Promise<number>((resolve, reject) => {
+      http
+        .get({ hostname: '127.0.0.1', port, path: '/%E0%A4%A' }, (res) => {
+          res.resume();
+          resolve(res.statusCode ?? 0);
+        })
+        .on('error', reject);
+    });
+    assert.equal(malformedStatus, 403);
+  });
+});

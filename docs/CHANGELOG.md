@@ -7,6 +7,7 @@ All notable changes to `p4jb` will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- Added zero-dependency Node.js static HTTP dev/preview server (`server.ts`, `lib/static-server.ts`, `package.json`, and `tests/static-server.test.ts`) serving all PS4 host files on port `3000` with proper `.js`/`.mjs`, `.manifest`, and `.bin`/`.elf` MIME types.
 - Created complete project documentation suite following The Vibe Coding Blueprint:
   - Root `AGENTS.md` with AI coding agent rules and mandatory Git/branching constraints.
   - `docs/PRD.md`, `docs/DESIGN_SYSTEM.md`, `docs/UX_FLOWS.md`, `docs/ARCHITECTURE.md`, `docs/TESTING.md`, `docs/ERROR_HANDLING.md`, `docs/ENVIRONMENT.md`, `docs/DEPLOYMENT.md`, `docs/DECISIONS.md`, and `docs/CHANGELOG.md`.

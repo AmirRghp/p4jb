@@ -20,7 +20,7 @@
 Because `g2all/` uses `<script type="module">` and payload loaders use `XMLHttpRequest` / `fetch()`, opening `index.html` via `file://` will fail due to browser CORS restrictions. Always serve via HTTP.
 
 ### Requirements
-- Any static HTTP server on LAN (e.g., `python -m http.server 8080`, `npx http-server`, Nginx, Caddy).
+- Run `npm run dev` (executes `node server.ts` on port `3000`, configurable via `PORT`/`HOST`) or any static HTTP server on LAN (e.g., `python -m http.server 8080`, `npx http-server`, Nginx, Caddy).
 - **MIME Types:**
   - `.js` / `.mjs` → `application/javascript` or `text/javascript` (required for ES Modules).
   - `.manifest` → `text/cache-manifest` (recommended for strict AppCache testing on older WebKit browsers).
