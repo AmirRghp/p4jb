@@ -22,6 +22,7 @@ All notable changes to `p4jb` will be documented in this file.
   - Updated `tests/static-server.test.ts` and `/docs` to reference `goldhen_2.4b18.14.bin` and firmware `14.02`.
 
 ### Removed
+- Removed all `Designed by` and `Special Thanks to:` bottom credit `<h1>` headings across all 21 host, cache, and restore HTML pages (along with the unused `.brand-tanin` rule in `style.css`), leaving zero text at the bottom of pages and bumping all 10 `*.manifest` files to `# bg-video v4`.
 - Removed the `For Donations (Only in Cryptocurrencies)` button and `#crypto` view from root `index.html` (adjusting footer `margin-top` to `338px` to preserve vertical layout alignment).
 
 ### Fixed

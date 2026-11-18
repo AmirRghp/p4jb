@@ -59,28 +59,6 @@ h1 {
     color: white;
 }
 
-.brand-tanin {
-    display: inline-block;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    margin: 0 10px 0 6px;
-    padding: 0 6px 2px;
-    color: #74e4ff;
-    border-bottom: 2px solid #74e4ff;
-    text-shadow: 0 0 10px rgba(116, 228, 255, 0.6);
-}
-
-@supports (-webkit-background-clip: text) {
-    .brand-tanin {
-        background: linear-gradient(90deg, #ff5a5f 0%, #ffb36b 48%, #74e4ff 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: none;
-        filter: drop-shadow(0 0 8px rgba(116, 228, 255, 0.5));
-    }
-}
-
 a {
     text-decoration: none;
 }

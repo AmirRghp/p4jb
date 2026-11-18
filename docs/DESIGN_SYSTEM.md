@@ -43,7 +43,7 @@ All color tokens below are extracted directly from `style.css` and inline HTML a
 | **Toolbox Hover** | `#d42a01` | `.btn-toolbox:hover` fill |
 | **Primary Text** | `white` (`#ffffff`) | Default `html` and `h1` text color |
 | **Section / Warning Highlight** | `yellow` (`#ffff00`) | Section subheadings (`Select Your Firmware`, `Main Payloads`) and failure messages (`hostFail()`) |
-| **Accent / Credit Links** | `#f31414` | Footer credit links (`@GamerHack93`, `@_AlAzif`, etc.) |
+| **Accent / Credit Links (Legacy)** | `#f31414` | Previously used in footer credit links (all footer credits removed in `p4jb`) |
 | **Status Pass / Fail (6.72)** | `green` / `red` | `Pass =` and `Fail =` counters in `672goldhen/index.html` and `672/index.html`; `Unsupported Firmware` in `g2all/index.html` |
 | **Text Shadow** | `black` (`#000000`) | `text-shadow: 0.1em 0.1em 0.2em black` on `h1` |
 
@@ -67,7 +67,7 @@ All color tokens below are extracted directly from `style.css` and inline HTML a
 - **Base Unit:** Ad-hoc pixel spacing (recommended `4px` / `8px` scale for future customizations).
 - **Observed Margins & Spacing:**
   - Button margins: `margin: 8px 5px;` (`top/bottom: 8px`, `left/right: 5px`), `padding-bottom: 5px`.
-  - Footer separation: large top/bottom inline margins (`margin-top: 78px`–`338px`, `margin-bottom: 77px`–`455px`) to push footer credits near the bottom of a `1080p` / `720p` PS4 viewport.
+  - Vertical centering margins: large inline margins (`margin-top: 77px`, `margin-bottom: 400px`–`455px`) on `#msgs` / `#msgs2` keep status messages positioned vertically without bottom footer text.
   - **Rule for Future Customizations:** Replace fixed pixel vertical spacers with flexbox/grid or CSS variables if converting to a responsive layout, and document the change here.
 
 ---
@@ -127,7 +127,7 @@ Pages use simple `display: block` / `display: none` section `<div>` containers t
 - **Header:** Full-width `<h1>` title (often `id="msgs"` on menu pages so hover descriptions appear at the top) followed by `<hr><br>`.
 - **Submenus:** In-page view swapping (`display: none` / `display: block`) with a `Return` button at the bottom.
 - **Cross-Page Links:** Mix of `<button onclick="location.replace(...)">` (avoids adding entries to browser history on PS4) and `<a href="..."><button>...</button></a>`.
-- **Footer:** Inline `<h1>` credits line with `#f31414` links.
+- **Footer:** None (all `Designed by` and `Special Thanks` footer lines have been removed across all host pages so no bottom text obscures the background video).
 
 ---
 
