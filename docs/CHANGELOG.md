@@ -13,6 +13,7 @@ All notable changes to `p4jb` will be documented in this file.
   - Updated `tests/static-server.test.ts` and `/docs` to reference `goldhen_2.4b18.14.bin` and firmware `14.02`.
 
 ### Fixed
+- Removed legacy `img.jpg` background image (`style.css`, `bg-video.js` `poster`, all `*.manifest` files, and `img.jpg` file) and switched `html` fallback background to `#0a0c12` (bumping manifests to `# bg-video v2`) so the old controller image no longer flashes before the background video loads.
 - Fixed `Uncaught SyntaxError: missing ) after argument list` in root `index.html` line 8 (`history.go(-histlength);`).
 
 ### Added

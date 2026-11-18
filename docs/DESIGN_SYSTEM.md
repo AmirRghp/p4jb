@@ -9,7 +9,7 @@
 - **Style:** Dark, high-contrast, TV-centric console utility interface.
 - **Mood:** Technical, direct, retro-console dashboard designed for viewing from a couch on a television screen via the PS4 browser.
 - **Design Principles:**
-  - High contrast white text with dark drop shadows over a looping full-screen background video (`public/assets/aistudio/Tanin1080p_b1930797.webm`, with `img.jpg` as fallback and a subtle dark scrim `.p4jb-bg-scrim` for readability).
+  - High contrast white text with dark drop shadows over a looping full-screen background video (`public/assets/aistudio/Tanin1080p_b1930797.webm`, with solid dark `#0a0c12` fallback and a subtle dark scrim `.p4jb-bg-scrim` for readability).
   - Large, uniform rectangular hit targets optimized for DualShock 4 analog-stick cursor navigation.
   - Zero external font or icon network dependencies so the entire UI renders identically offline.
   - Immediate single-line status feedback (`#msgs`) on button hover and exploit progress.
@@ -21,7 +21,6 @@
 - **Current Baseline Name:** `PS4 Exploit Host by GamerHack` (to be updated when `p4jb` custom branding is applied).
 - **Logo / Imagery:**
   - `public/assets/aistudio/Tanin1080p_b1930797.webm` — Full-viewport fixed looping background video injected across root and all sub-hosts via `bg-video.js` (`#p4jb-bg-layer`, `#p4jb-bg-video`, `.p4jb-bg-scrim`).
-  - `img.jpg` — Full-viewport fixed fallback background image (`../img.jpg`) shown if the video is loading or unsupported.
   - `btc.jpg`, `eth.jpg` — `150px × 150px` QR code images inside `#crypto` on `index.html`.
 - **Brand Voice:** Concise, imperative, console-status messaging (e.g., `"Select Your Firmware"`, `"Loading GoldHEN v2.4b18.14... Please Wait"`, `"Cache Installed Successfully ✔"`).
 
@@ -33,7 +32,7 @@ All color tokens below are extracted directly from `style.css` and inline HTML a
 
 | Role | Value | Usage |
 | :--- | :--- | :--- |
-| **Background Fallback** | `#24272b` | `html { background-color: #24272b; }` when `img.jpg` is absent/loading |
+| **Background Fallback** | `#0a0c12` | `html { background-color: #0a0c12; }` while the background video loads or if unsupported |
 | **Primary Button** | `#003263` | Default `.btn` fill (deep navy blue) |
 | **Primary Button Hover** | `#0069d9` | `.btn:hover` fill (bright blue) |
 | **Multi-FW Highlight Button** | `#b8860b` | `.btn-multi` fill (dark goldenrod for `GoldHEN Multi FW`) |
@@ -82,7 +81,7 @@ All color tokens below are extracted directly from `style.css` and inline HTML a
 
 ## 7. Shadows
 
-- **Headings (`h1`):** `text-shadow: 0.1em 0.1em 0.2em black;` for legibility over `img.jpg`.
+- **Headings (`h1`):** `text-shadow: 0.1em 0.1em 0.2em black;` for legibility over the background video.
 - **Buttons / Containers:** `none` (flat surface with `0.4s` background-color hover transition).
 
 ---

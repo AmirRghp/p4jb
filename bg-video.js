@@ -34,7 +34,6 @@
     video.setAttribute('muted', '');
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
-    video.setAttribute('poster', prefix + 'img.jpg');
     video.src = prefix + 'public/assets/aistudio/Tanin1080p_b1930797.webm';
 
     video.addEventListener('error', function () {

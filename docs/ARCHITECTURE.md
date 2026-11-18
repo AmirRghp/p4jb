@@ -38,7 +38,7 @@
 
 ### Root Entry (`/` — `index.html`, `style.css`)
 - Presents the top-level firmware selector and links to each sub-host.
-- Hosts shared visual tokens (`style.css`), background (`img.jpg`), and crypto donation QR assets (`btc.jpg`, `eth.jpg`).
+- Hosts shared visual tokens (`style.css`), background video loader (`bg-video.js`), and crypto donation QR assets (`btc.jpg`, `eth.jpg`).
 
 ### Multi-FW Auto-Host (`g2all/`)
 - Inspects `navigator.userAgent` with `/PlayStation 4[ /]([\d.]+)/i`.
@@ -97,7 +97,7 @@ p4jb/
 ├── README.md                  # Quick steps & firmware list
 ├── index.html                 # Root firmware & host selection menu
 ├── style.css                  # Shared global stylesheet
-├── img.jpg                    # Shared background image
+├── bg-video.js                # Shared background video injector
 ├── btc.jpg / eth.jpg          # Crypto donation QR images
 ├── docs/                      # Project documentation suite (10 files)
 ├── 505/                       # PS4 5.05 Host v2.5 (exploit.js, cache.html, cache.manifest, *.bin)
@@ -124,7 +124,7 @@ p4jb/
 
 - **Offline Self-Containment:** Every file loaded during offline jailbreak execution (HTML, CSS, JS, images, `.bin`, `.elf`) must reside in the repository and be declared in the corresponding `*.manifest`.
 - **No External Runtime Dependencies:** Do not import external CDNs, Google Fonts, or remote JS libraries into cached exploit pages.
-- **Relative Paths Only:** Sub-hosts reference root assets via `../style.css` and `../img.jpg` (or `../../style.css` inside `restore/<fw>/`) so the site works both at domain root and under a GitHub Pages repository subpath (`/p4jb/`).
+- **Relative Paths Only:** Sub-hosts reference root assets via `../style.css` and `../bg-video.js` (or `../../style.css` and `../../bg-video.js` inside `restore/<fw>/`) so the site works both at domain root and under a GitHub Pages repository subpath (`/p4jb/`).
 - **Upstream Isolation Rule:** Keep personal customizations decoupled from low-level exploit engines whenever possible to avoid merge conflicts with `upstream-main`.
 
 ---
