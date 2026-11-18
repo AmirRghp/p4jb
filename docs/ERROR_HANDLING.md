@@ -14,11 +14,11 @@ Because `p4jb` runs purely client-side in the PS4 WebKit browser (where DevTools
 
 ### Non-PS4 Browser (`g2all/index.html`)
 - **Trigger:** `navigator.userAgent` does not match `/PlayStation 4[ /]([\d.]+)/i`.
-- **UI Message:** `"Only for PS4 with Firmware 5.05 and 7.00 to 14.00"` (rendered into `#msgs` on `DOMContentLoaded`).
+- **UI Message:** `"Only for PS4 with Firmware 5.05 and 7.00 to 14.02"` (rendered into `#msgs` on `DOMContentLoaded`).
 - **Recovery:** Open the page from a PlayStation 4 browser, or use a dedicated host / spoof UA for desktop testing.
 
 ### Unsupported PS4 Firmware (`g2all/index.html`)
-- **Trigger:** PS4 UA detected, `applicationCache.status == '0'`, and `fwNum` does not fall into supported ranges (`5.05`/`5.07`, `7.00–8.52`, `9.00–9.60`, `10.00–11.02`, `11.50–14.00`—for example, `6.72` or unlisted minor versions).
+- **Trigger:** PS4 UA detected, `applicationCache.status == '0'`, and `fwNum` does not fall into supported ranges (`5.05`/`5.07`, `7.00–8.52`, `9.00–9.60`, `10.00–11.02`, `11.50–14.02`—for example, `6.72` or unlisted minor versions).
 - **UI Message:** `Unsupported Firmware: <span style="color: red;"><fwVersion></span>`.
 - **Recovery:** Use dedicated `672/` or `672goldhen/` from root `index.html`, or verify firmware support.
 
@@ -50,7 +50,7 @@ Because `p4jb` runs purely client-side in the PS4 WebKit browser (where DevTools
 - **Trigger:** Global `error` or `unhandledrejection` events during PSFree/Lapse execution.
 - **Behavior:** Displays `alert()` containing error message, `sourceURL`, `line`, `column`, and `stack` because PS4 browser lacks a user-accessible console.
 
-### Exploit Chain Failure (`g2all/css/main.js`, `g2all/slopkit/jb.js`, `g2all/slopkit/jb2.js`)
+### Exploit Chain Failure (`g2all/css/main.js`, `g2all/slopkit/jb.js`, `g2all/slopkit/chain_lapse.js`)
 - **Trigger:** Exception in `doJb()` or Slopkit exploit chain (`hostFail()`).
 - **UI Message:** `"Failed to Load! Restart Your Console ..."` styled in `color: yellow`.
 - **Recovery:** Reboot the PS4 console (required after memory corruption / failed kernel state) and retry.

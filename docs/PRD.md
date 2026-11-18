@@ -9,14 +9,14 @@
 - **Product Name:** `p4jb` (PS4 Exploit Host — Personal Fork of GamerHack PS4 Exploit Host)
 - **One-Line Description:** An offline-capable, static web host that delivers PlayStation 4 WebKit/kernel exploits, GoldHEN, and homebrew/mod payloads directly through the PS4 console browser.
 - **Product Type:** Static Multi-Page Client-Side Web Application (HTML5 + CSS3 + Vanilla JS + HTML5 AppCache + Binary Payloads)
-- **Primary Platform:** PlayStation 4 Built-in WebKit Browser (Firmware `5.05`, `6.72`, `7.00`–`14.00`), hosted via GitHub Pages or a local LAN HTTP server.
+- **Primary Platform:** PlayStation 4 Built-in WebKit Browser (Firmware `5.05`, `6.72`, `7.00`–`14.02`), hosted via GitHub Pages or a local LAN HTTP server.
 
 ---
 
 ## 2. Problem
 
 ### What problem are we solving?
-Stock PlayStation 4 consoles on exploitable firmware versions (`5.05` through `14.00`) require running a WebKit and kernel exploit chain from the console's browser after cold boots or rest-mode failures in order to load GoldHEN and homebrew payloads. Users also need a reliable way to run the host **completely offline** once cached so consoles can remain disconnected from the internet (avoiding accidental firmware updates or Sony server telemetry).
+Stock PlayStation 4 consoles on exploitable firmware versions (`5.05` through `14.02`) require running a WebKit and kernel exploit chain from the console's browser after cold boots or rest-mode failures in order to load GoldHEN and homebrew payloads. Users also need a reliable way to run the host **completely offline** once cached so consoles can remain disconnected from the internet (avoiding accidental firmware updates or Sony server telemetry).
 
 ### Why does this problem matter?
 - Different PS4 firmware versions require completely different WebKit entrypoints, ROP/memory primitives, kernel exploits, and binary patches.
@@ -30,9 +30,9 @@ Users either rely on public third-party hosts (such as `gamerhack.github.io` or 
 
 ## 3. Goal
 
-- **Primary Goal:** Provide a reliable, fast, offline-first PS4 Exploit Host supporting firmware `5.05`, `6.72`, and `7.00`–`14.00`, while establishing a clean, documented baseline for safe personal customization in `p4jb`.
+- **Primary Goal:** Provide a reliable, fast, offline-first PS4 Exploit Host supporting firmware `5.05`, `6.72`, and `7.00`–`14.02`, while establishing a clean, documented baseline for safe personal customization in `p4jb`.
 - **Secondary Goals:**
-  - Support automatic firmware detection (`g2all/`) for zero-click GoldHEN loading across `5.05` and `7.00`–`14.00`.
+  - Support automatic firmware detection (`g2all/`) for zero-click GoldHEN loading across `5.05` and `7.00`–`14.02`.
   - Provide full dedicated payload menus for legacy firmwares (`5.05`, `6.72`, `9.00`).
   - Provide User's Guide restoration payloads (`restore/`) without requiring custom DNS.
   - Keep customizations isolated enough to cleanly merge future `upstream` (`GamerHack/GamerHack.github.io`) exploit updates.
@@ -42,7 +42,7 @@ Users either rely on public third-party hosts (such as `gamerhack.github.io` or 
 ## 4. Target Users
 
 ### User Type 1 — PS4 Console Owner / End User
-- **Description:** A PS4 owner running firmware `5.05`, `6.72`, or `7.00`–`14.00` using the console's built-in browser with a DualShock 4 controller.
+- **Description:** A PS4 owner running firmware `5.05`, `6.72`, or `7.00`–`14.02` using the console's built-in browser with a DualShock 4 controller.
 - **Needs:**
   - Clear firmware selection and one-click auto-exploit execution.
   - Reliable offline caching so the console can stay disconnected from the internet.
@@ -63,7 +63,7 @@ Users either rely on public third-party hosts (such as `gamerhack.github.io` or 
 
 ## 5. User Stories
 
-- As a PS4 user on firmware `5.05` or `7.00`–`14.00`, I want the multi-firmware host (`g2all/`) to automatically detect my firmware and load GoldHEN `v2.4b18.13` so that I don't have to pick an exploit chain manually.
+- As a PS4 user on firmware `5.05` or `7.00`–`14.02`, I want the multi-firmware host (`g2all/`) to automatically detect my firmware and load GoldHEN `v2.4b18.14` so that I don't have to pick an exploit chain manually.
 - As a PS4 user on `5.05`, `6.72`, or `9.00`, I want access to a dedicated payload menu so that I can run tools like FTP, Dumper, App2USB, Fan Threshold, Linux Loaders, Web-Activator, and Game Mods.
 - As a PS4 user, I want the host to install all required files into the browser's offline cache on first visit so that I can turn off the internet afterward.
 - As a PS4 user, I want a Restore Host option (`restore/`) so that I can restore a User's Guide host without configuring DNS.
@@ -84,25 +84,23 @@ Users either rely on public third-party hosts (such as `gamerhack.github.io` or 
   - Donations view toggles `#menu` / `#crypto` cleanly and returns to `#menu`.
 
 ### Feature 2 — Auto-Detecting Multi-Firmware GoldHEN Host (`g2all/`)
-- **Purpose:** Detects the console's PS4 firmware version from `navigator.userAgent`, installs the matching firmware family's offline AppCache, and executes the appropriate exploit chain to load `goldhen_2.4b18.13.bin`.
+- **Purpose:** Detects the console's PS4 firmware version from `navigator.userAgent`, installs the matching firmware family's offline AppCache, and executes the appropriate exploit chain to load `goldhen_2.4b18.14.bin`.
 - **Supported Firmware Ranges (Baseline):**
   - `5.05`, `5.07` → `cache505.html` / `505/exploit.js`
   - `7.00`–`8.52` → `cache700.html` / `700/alert.js` (PSFree + Lapse + kpatch)
   - `9.00`–`9.60` → `cache900.html` / `900/alert.js` (PSFree + Lapse + kpatch)
   - `10.00`–`11.02` → `cachecss.html` / `css/main.js` (Lapse or Poops chain + patches)
-  - `11.50`–`12.02` → `cacheslopkit.html` / `slopkit/chain_lapse.js`
-  - `12.50`–`13.00` → `cacheslopkit.html` / `slopkit/chain_poops.js`
-  - `13.02`–`13.52` → `cacheslopkit.html` / `slopkit/jb.js?v=19`
-  - `14.00` → `cacheslopkit.html` / `slopkit/jb2.js`
+  - `11.50`–`11.52` → `cacheslopkit.html` / `slopkit/chain_lapse.js`
+  - `12.00`–`14.02` → `cacheslopkit.html` / `slopkit/jb.js`
 - **Edge Cases:**
-  - Non-PS4 browser visits → displays `"Only for PS4 with Firmware 5.05 and 7.00 to 14.00"`.
+  - Non-PS4 browser visits → displays `"Only for PS4 with Firmware 5.05 and 7.00 to 14.02"`.
   - Unsupported PS4 firmware → displays `"Unsupported Firmware: <version>"` in red.
   - Uncached state (`applicationCache.status == '0'`) → redirects to firmware-specific cache page.
 
 ### Feature 3 — Dedicated Firmware Hosts (`505/`, `672goldhen/`, `672/`, `900goldhen/`, `900v3/`)
 - **Purpose:** Provide single-firmware optimized hosts:
-  - `672goldhen/` & `900goldhen/`: Automatic GoldHEN `v2.4b18.13` loading (with `passcount`/`failcount` tracking on `672goldhen`).
-  - `505/` (v2.5), `672/` (v3.0), `900v3/` (v3.0): Full payload dashboards including GoldHEN `v2.4b18.13` & `v2.3`, Bin Loader (port `9020`), system utilities (ToDex, Dumper, FTP, App2USB, DB Backup/Restore, Update Blocker, Kernel/Module Dumper, PS4 Debug, RIF Renamer, Remote Play, WebRTE, Fan Threshold `50°C`–`75°C`, Orbis Toolbox), Linux loaders (1GB–4GB standard & PS4-Pro on 9.00), Web-Activator (`900v3`), and Game Mods (GTA V & RDR2).
+  - `672goldhen/` & `900goldhen/`: Automatic GoldHEN `v2.4b18.14` loading (with `passcount`/`failcount` tracking on `672goldhen`).
+  - `505/` (v2.5), `672/` (v3.0), `900v3/` (v3.0): Full payload dashboards including GoldHEN `v2.4b18.14` & `v2.3`, Bin Loader (port `9020`), system utilities (ToDex, Dumper, FTP, App2USB, DB Backup/Restore, Update Blocker, Kernel/Module Dumper, PS4 Debug, RIF Renamer, Remote Play, WebRTE, Fan Threshold `50°C`–`75°C`, Orbis Toolbox), Linux loaders (1GB–4GB standard & PS4-Pro on 9.00), Web-Activator (`900v3`), and Game Mods (GTA V & RDR2).
 - **Edge Cases:**
   - Uncached visit (`applicationCache.status == '0'`) redirects to local `cache.html` (`505/`, `900goldhen/`, `900v3/`) or caches inline (`672/`, `672goldhen/`).
   - External links (e.g., `http://ps4trainer.com/Trainer/index.html` and online Game Mods) require an active internet connection.
@@ -130,7 +128,7 @@ The following are intentionally NOT part of the current baseline:
 ## 8. Scope: Current Baseline vs. Future Personalization
 
 ### Current Baseline (Documented Now)
-- Complete GamerHack PS4 Exploit Host (`5.05`–`14.00`) as forked in `p4jb`.
+- Complete GamerHack PS4 Exploit Host (`5.05`–`14.02`) as forked in `p4jb`.
 - English UI with GamerHack branding, credits, and BTC/ETH donation view.
 - Full documentation suite (`/docs` + `AGENTS.md`) and Git branch strategy (`main` + `upstream-main`).
 
@@ -144,7 +142,7 @@ The following are intentionally NOT part of the current baseline:
 ## 9. Success Metrics
 
 - **Offline Reliability:** 100% of assets required for offline jailbreak/GoldHEN loading are cached cleanly with zero 404 errors.
-- **Routing Accuracy:** `g2all/index.html` maps every documented PS4 firmware string (`5.05`–`14.00`) to its intended exploit script without syntax or path errors.
+- **Routing Accuracy:** `g2all/index.html` maps every documented PS4 firmware string (`5.05`–`14.02`) to its intended exploit script without syntax or path errors.
 - **Maintainability:** Future upstream updates from `GamerHack/GamerHack.github.io` merge into `main` cleanly with minimal conflicts.
 
 ---

@@ -14,7 +14,7 @@
 
 - **Pattern:** Static Multi-Page Application (MPA) with Client-Side Firmware Routing.
 - **Reason:**
-  - PS4 firmware versions (`5.05`–`14.00`) span multiple WebKit generations that do not support modern Service Workers or heavy ES2022+ JavaScript bundles.
+  - PS4 firmware versions (`5.05`–`14.02`) span multiple WebKit generations that do not support modern Service Workers or heavy ES2022+ JavaScript bundles.
   - Zero build step allows direct deployment to GitHub Pages or lightweight LAN HTTP servers without compilation.
   - Self-contained directory isolation per firmware lets each host maintain its own `cache.manifest` and prevents unrelated WebKit bugs from leaking across firmware versions.
 
@@ -43,7 +43,7 @@
 ### Multi-FW Auto-Host (`g2all/`)
 - Inspects `navigator.userAgent` with `/PlayStation 4[ /]([\d.]+)/i`.
 - Routes uncached clients (`window.applicationCache.status == '0'`) to a firmware-family cache installer (`cache505.html`, `cache700.html`, `cache900.html`, `cachecss.html`, `cacheslopkit.html`).
-- Routes cached clients to the matching exploit entrypoint (`505/exploit.js`, `700/alert.js`, `900/alert.js`, `css/main.js`, or `slopkit/*`) and loads `g2all/goldhen_2.4b18.13.bin`.
+- Routes cached clients to the matching exploit entrypoint (`505/exploit.js`, `700/alert.js`, `900/alert.js`, `css/main.js`, or `slopkit/*`) and loads `g2all/goldhen_2.4b18.14.bin`.
 
 ### Dedicated Legacy Hosts (`505/`, `672goldhen/`, `672/`, `900goldhen/`, `900v3/`)
 - Single-firmware hosts supporting either automatic GoldHEN (`672goldhen/`, `900goldhen/`) or full interactive payload dashboards (`505/`, `672/`, `900v3/`).
@@ -58,7 +58,7 @@
 
 ```mermaid
 flowchart TD
-    Root["Root: index.html + style.css"] --> G2All["g2all/ (Multi-FW Auto 5.05, 7.00-14.00)"]
+    Root["Root: index.html + style.css"] --> G2All["g2all/ (Multi-FW Auto 5.05, 7.00-14.02)"]
     Root --> H505["505/ (Host v2.5)"]
     Root --> H672G["672goldhen/ (Auto GoldHEN)"]
     Root --> H672["672/ (Host v3.0)"]
@@ -72,7 +72,7 @@ flowchart TD
     Router -->|"7.00 - 8.52"| E700["g2all/700/alert.js -> psfree.js + lapse.js"]
     Router -->|"9.00 - 9.60"| E900["g2all/900/alert.js -> psfree.js + lapse.js"]
     Router -->|"10.00 - 11.02"| ECSS["g2all/css/main.js -> doJb()"]
-    Router -->|"11.50 - 14.00"| ESlop["g2all/slopkit/ (chain_lapse / chain_poops / jb / jb2)"]
+    Router -->|"11.50 - 14.02"| ESlop["g2all/slopkit/ (chain_lapse / jb)"]
 ```
 
 ---
@@ -105,16 +105,16 @@ p4jb/
 ├── 672/                       # PS4 6.72 Host v3.0 (jb2.js, frontend.js, payload.js, *.bin)
 ├── 900goldhen/                # PS4 9.00 Auto GoldHEN host (webkit.js, kexploit.js, rop.js, int64.js)
 ├── 900v3/                     # PS4 9.00 Host v3.0 (full payloads, Linux loaders, webactivator, mods)
-├── g2all/                     # Multi-FW Auto-Host (5.05 & 7.00-14.00)
+├── g2all/                     # Multi-FW Auto-Host (5.05 & 7.00-14.02)
 │   ├── index.html             # UA parser & firmware router
 │   ├── cache*.html            # Per-family cache installers
 │   ├── *.manifest             # Per-family AppCache manifests
-│   ├── goldhen_2.4b18.13.bin  # Shared GoldHEN binary
+│   ├── goldhen_2.4b18.14.bin  # Shared GoldHEN binary
 │   ├── 505/                   # 5.05 exploit.js
 │   ├── 700/                   # PSFree + Lapse (7.00-8.52) + kpatch/*.elf
 │   ├── 900/                   # PSFree + Lapse (9.00-9.60) + kpatch/*.elf
 │   ├── css/                   # 10.00-11.02 chain + workers + ps4/patches/*.bin
-│   └── slopkit/               # 11.50-14.00 chains + patches/*.bin
+│   └── slopkit/               # 11.50-14.02 chains + patches/*.bin
 └── restore/                   # User's Guide restore hosts (505, 672, 672goldhen, 900goldhen, 900v3)
 ```
 
