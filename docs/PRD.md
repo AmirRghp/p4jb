@@ -74,14 +74,13 @@ Users either rely on public third-party hosts (such as `gamerhack.github.io` or 
 ## 6. Core Features (Current Baseline)
 
 ### Feature 1 — Root Firmware & Host Selector (`index.html`)
-- **Purpose:** Serves as the main landing menu linking to all supported firmware hosts, the restore menu, and the cryptocurrency donations view.
-- **User Flow:** User opens root `/` → hovers buttons to inspect descriptions in `#msgs` → clicks a host button or `For Donations`.
+- **Purpose:** Serves as the main landing menu linking to all supported firmware hosts and the restore menu.
+- **User Flow:** User opens root `/` → hovers buttons to inspect descriptions in `#msgs` → clicks a host button.
 - **Inputs:** Controller/mouse hover (`onmouseover`/`onmouseout`) and button click (`onclick` / `<a href>`).
-- **Outputs:** Navigation to `g2all/index.html`, `505/index.html`, `672goldhen/index.html`, `672/index.html`, `900goldhen/index.html`, `900v3/index.html`, `restore/index.html`, or toggling `#crypto` view.
+- **Outputs:** Navigation to `g2all/index.html`, `505/index.html`, `672goldhen/index.html`, `672/index.html`, `900goldhen/index.html`, `900v3/index.html`, or `restore/index.html`.
 - **Acceptance Criteria:**
   - All 7 navigation buttons route to valid local HTML entry points.
   - `#msgs` updates on hover and resets on mouseout.
-  - Donations view toggles `#menu` / `#crypto` cleanly and returns to `#menu`.
 
 ### Feature 2 — Auto-Detecting Multi-Firmware GoldHEN Host (`g2all/`)
 - **Purpose:** Detects the console's PS4 firmware version from `navigator.userAgent`, installs the matching firmware family's offline AppCache, and executes the appropriate exploit chain to load `goldhen_2.4b18.14.bin`.
