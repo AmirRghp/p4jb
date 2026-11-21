@@ -16,132 +16,30 @@
     return /PlayStation 4/i.test(ua);
   }
 
-  function getUrlApi() {
-    return window.URL || window.webkitURL || null;
+  function isBrowserOffline() {
+    return typeof navigator !== 'undefined' && navigator.onLine === false;
   }
 
   function pickVideoSources(video, webmUrl, mp4Url) {
-    var mp4 = { url: mp4Url, type: 'video/mp4' };
-    var webm = { url: webmUrl, type: 'video/webm' };
-
     if (isPS4Browser()) {
-      return [mp4];
+      return [mp4Url];
     }
 
     if (typeof video.canPlayType === 'function') {
       try {
         if (video.canPlayType('video/webm; codecs="vp9"') === 'probably') {
-          return [webm, mp4];
+          return [webmUrl, mp4Url];
         }
         if (video.canPlayType('video/mp4; codecs="avc1.4d401f"') !== '' || video.canPlayType('video/mp4') !== '') {
-          return [mp4, webm];
+          return [mp4Url, webmUrl];
         }
         if (video.canPlayType('video/webm') !== '') {
-          return [webm, mp4];
+          return [webmUrl, mp4Url];
         }
       } catch (e) {}
     }
 
-    return [mp4, webm];
-  }
-
-  function buildAttempts(sources) {
-    var attempts = [];
-    for (var i = 0; i < sources.length; i++) {
-      attempts.push({ url: sources[i].url, type: sources[i].type, mode: 'blob' });
-      attempts.push({ url: sources[i].url, type: sources[i].type, mode: 'direct' });
-    }
-    return attempts;
-  }
-
-  function fetchBlobUrl(url, mimeType, onDone) {
-    var urlApi = getUrlApi();
-    if (!window.XMLHttpRequest || !urlApi || typeof urlApi.createObjectURL !== 'function') {
-      onDone(null);
-      return null;
-    }
-
-    var settled = false;
-    function finish(result) {
-      if (!settled) {
-        settled = true;
-        onDone(result);
-      }
-    }
-
-    var xhr = new XMLHttpRequest();
-    try {
-      xhr.open('GET', url, true);
-    } catch (e) {
-      finish(null);
-      return null;
-    }
-
-    try {
-      xhr.responseType = 'blob';
-    } catch (e) {}
-    if (xhr.responseType !== 'blob') {
-      try {
-        xhr.responseType = 'arraybuffer';
-      } catch (e) {}
-    }
-
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState !== 4) {
-        return;
-      }
-      var res = xhr.response;
-      var okStatus = xhr.status === 200 || (xhr.status === 0 && !!res);
-      if (!okStatus || !res) {
-        finish(null);
-        return;
-      }
-
-      var blob = null;
-      try {
-        if (typeof Blob !== 'undefined' && res instanceof Blob) {
-          if (res.size <= 0) {
-            finish(null);
-            return;
-          }
-          if (res.type === mimeType) {
-            blob = res;
-          } else if (typeof res.slice === 'function') {
-            blob = res.slice(0, res.size, mimeType);
-          } else {
-            blob = new Blob([res], { type: mimeType });
-          }
-        } else if (res.byteLength && res.byteLength > 0 && typeof Blob !== 'undefined') {
-          blob = new Blob([res], { type: mimeType });
-        }
-      } catch (e) {
-        blob = null;
-      }
-
-      if (!blob) {
-        finish(null);
-        return;
-      }
-
-      try {
-        finish(urlApi.createObjectURL(blob));
-      } catch (e) {
-        finish(null);
-      }
-    };
-
-    xhr.onerror = function () {
-      finish(null);
-    };
-
-    try {
-      xhr.send(null);
-    } catch (e) {
-      finish(null);
-      return null;
-    }
-
-    return xhr;
+    return [mp4Url, webmUrl];
   }
 
   function injectBackgroundVideo() {
@@ -151,6 +49,7 @@
 
     var prefix = getRootPrefix();
     var posterUrl = prefix + 'public/assets/aistudio/tanin-poster.jpg';
+    var gifUrl = prefix + 'public/assets/aistudio/tanin-bg.gif';
     var webmUrl = prefix + 'public/assets/aistudio/Tanin1080p_b1930797.webm';
     var mp4Url = prefix + 'public/assets/aistudio/tanin-bg.mp4';
 
@@ -189,11 +88,11 @@
     layer.appendChild(scrim);
     document.body.insertBefore(layer, document.body.firstChild);
 
-    var attempts = buildAttempts(pickVideoSources(video, webmUrl, mp4Url));
-    var attemptIndex = 0;
-    var activeObjectUrl = null;
-    var activeXhr = null;
-    var loadToken = 0;
+    var sources = pickVideoSources(video, webmUrl, mp4Url);
+    var sourceIndex = 0;
+    var gifActive = false;
+    var videoReady = false;
+    var watchdogTimer = null;
     var gestureBound = false;
 
     var motionQuery = null;
@@ -211,25 +110,10 @@
       return document.hidden === true || document.visibilityState === 'hidden';
     }
 
-    function revokeActiveObjectUrl() {
-      if (!activeObjectUrl) {
-        return;
-      }
-      var urlApi = getUrlApi();
-      if (urlApi && typeof urlApi.revokeObjectURL === 'function') {
-        try {
-          urlApi.revokeObjectURL(activeObjectUrl);
-        } catch (e) {}
-      }
-      activeObjectUrl = null;
-    }
-
-    function abortActiveXhr() {
-      if (activeXhr) {
-        try {
-          activeXhr.abort();
-        } catch (e) {}
-        activeXhr = null;
+    function clearWatchdog() {
+      if (watchdogTimer !== null) {
+        clearTimeout(watchdogTimer);
+        watchdogTimer = null;
       }
     }
 
@@ -244,11 +128,26 @@
       document.removeEventListener('keydown', retryOnGesture, true);
     }
 
+    function activateGifFallback() {
+      clearWatchdog();
+      unbindGestureListeners();
+      gifActive = true;
+      try {
+        video.pause();
+      } catch (e) {}
+      video.removeAttribute('src');
+      video.style.display = 'none';
+      if (!isReducedMotion()) {
+        layer.style.backgroundImage = 'url("' + gifUrl + '")';
+      } else {
+        layer.style.backgroundImage = 'url("' + posterUrl + '")';
+      }
+    }
+
     function safePlay() {
-      if (isPageHidden() || isReducedMotion() || video.style.display === 'none') {
+      if (gifActive || isPageHidden() || isReducedMotion() || video.style.display === 'none') {
         return;
       }
-      // Enforce muted state immediately before play() for strict WebKit autoplay policies
       video.muted = true;
       video.defaultMuted = true;
       if (typeof video.play === 'function') {
@@ -266,11 +165,11 @@
     }
 
     function retryOnGesture() {
-      if (isReducedMotion() || isPageHidden() || video.style.display === 'none') {
+      if (gifActive || isReducedMotion() || isPageHidden() || video.style.display === 'none') {
         return;
       }
-      if (!video.getAttribute('src') && attemptIndex < attempts.length) {
-        loadCurrentAttempt();
+      if (!video.getAttribute('src') && sourceIndex < sources.length) {
+        loadCurrentSource();
         return;
       }
       if (video.paused) {
@@ -291,68 +190,50 @@
       document.addEventListener('keydown', retryOnGesture, true);
     }
 
-    function applyVideoSource(srcUrl, isBlob) {
-      revokeActiveObjectUrl();
-      if (isBlob) {
-        activeObjectUrl = srcUrl;
+    function startWatchdog() {
+      clearWatchdog();
+      watchdogTimer = setTimeout(function () {
+        watchdogTimer = null;
+        if (!videoReady && (!video.readyState || video.readyState < 2)) {
+          activateGifFallback();
+        }
+      }, 2500);
+    }
+
+    function loadCurrentSource() {
+      if (isReducedMotion()) {
+        clearWatchdog();
+        video.style.display = 'none';
+        layer.style.backgroundImage = 'url("' + posterUrl + '")';
+        return;
       }
+      if (isBrowserOffline() || sourceIndex >= sources.length) {
+        activateGifFallback();
+        return;
+      }
+
+      gifActive = false;
+      videoReady = false;
+      layer.style.backgroundImage = 'url("' + posterUrl + '")';
       video.style.display = '';
       video.muted = true;
       video.defaultMuted = true;
-      video.src = srcUrl;
+      video.src = sources[sourceIndex];
       if (typeof video.load === 'function') {
         try {
           video.load();
         } catch (e) {}
       }
+      startWatchdog();
       safePlay();
     }
 
-    function advanceAttempt() {
-      attemptIndex += 1;
-      loadCurrentAttempt();
-    }
-
-    function loadCurrentAttempt() {
-      loadToken += 1;
-      var token = loadToken;
-      abortActiveXhr();
-
-      if (attemptIndex >= attempts.length) {
-        revokeActiveObjectUrl();
-        video.removeAttribute('src');
-        video.style.display = 'none';
-        unbindGestureListeners();
+    function onVideoReady() {
+      if (gifActive) {
         return;
       }
-
-      var attempt = attempts[attemptIndex];
-      if (attempt.mode === 'blob') {
-        activeXhr = fetchBlobUrl(attempt.url, attempt.type, function (objectUrl) {
-          if (token !== loadToken) {
-            if (objectUrl) {
-              var urlApi = getUrlApi();
-              if (urlApi && typeof urlApi.revokeObjectURL === 'function') {
-                try {
-                  urlApi.revokeObjectURL(objectUrl);
-                } catch (e) {}
-              }
-            }
-            return;
-          }
-          activeXhr = null;
-          if (objectUrl) {
-            applyVideoSource(objectUrl, true);
-          } else {
-            advanceAttempt();
-          }
-        });
-      } else {
-        applyVideoSource(attempt.url, false);
-      }
-    }
-
-    function onVideoReady() {
+      videoReady = true;
+      clearWatchdog();
       if (video.paused) {
         safePlay();
       } else {
@@ -360,29 +241,49 @@
       }
     }
 
-    video.addEventListener('loadedmetadata', onVideoReady);
     video.addEventListener('loadeddata', onVideoReady);
     video.addEventListener('canplay', onVideoReady);
     video.addEventListener('playing', function () {
+      if (gifActive) {
+        return;
+      }
+      videoReady = true;
+      clearWatchdog();
       unbindGestureListeners();
     });
     video.addEventListener('error', function () {
-      advanceAttempt();
+      if (gifActive) {
+        return;
+      }
+      sourceIndex += 1;
+      loadCurrentSource();
     });
 
     function syncMotionAndVisibility() {
       if (isReducedMotion()) {
+        clearWatchdog();
         try {
           video.pause();
         } catch (e) {}
         video.style.display = 'none';
+        layer.style.backgroundImage = 'url("' + posterUrl + '")';
         return;
       }
 
-      if (attemptIndex < attempts.length) {
+      if (gifActive) {
+        layer.style.backgroundImage = 'url("' + gifUrl + '")';
+        return;
+      }
+
+      if (isBrowserOffline()) {
+        activateGifFallback();
+        return;
+      }
+
+      if (sourceIndex < sources.length) {
         video.style.display = '';
-        if (!video.getAttribute('src') && !activeXhr) {
-          loadCurrentAttempt();
+        if (!video.getAttribute('src')) {
+          loadCurrentSource();
           return;
         }
       }
@@ -397,17 +298,20 @@
     }
 
     document.addEventListener('visibilitychange', syncMotionAndVisibility);
-    window.addEventListener('pagehide', function (e) {
-      try {
-        video.pause();
-      } catch (err) {}
-      if (!e || !e.persisted) {
-        loadToken += 1;
-        abortActiveXhr();
-        revokeActiveObjectUrl();
-      }
-    });
-    window.addEventListener('pageshow', syncMotionAndVisibility);
+    if (typeof window.addEventListener === 'function') {
+      window.addEventListener('pagehide', function () {
+        clearWatchdog();
+        try {
+          video.pause();
+        } catch (e) {}
+      });
+      window.addEventListener('pageshow', syncMotionAndVisibility);
+      window.addEventListener('offline', function () {
+        if (!videoReady) {
+          activateGifFallback();
+        }
+      });
+    }
 
     if (motionQuery) {
       if (typeof motionQuery.addEventListener === 'function') {
@@ -417,18 +321,23 @@
       }
     }
 
-    bindGestureListeners();
-
-    if (!isReducedMotion()) {
-      // Defer async XHR slightly so exploit bootstrap scripts in g2all and legacy hosts run first
-      setTimeout(function () {
-        if (!isReducedMotion() && !video.getAttribute('src') && !activeXhr) {
-          loadCurrentAttempt();
-        }
-      }, 80);
-    } else {
+    if (isReducedMotion()) {
       video.style.display = 'none';
+      layer.style.backgroundImage = 'url("' + posterUrl + '")';
+      return;
     }
+
+    if (isBrowserOffline()) {
+      activateGifFallback();
+      return;
+    }
+
+    bindGestureListeners();
+    setTimeout(function () {
+      if (!gifActive && !isReducedMotion() && !video.getAttribute('src')) {
+        loadCurrentSource();
+      }
+    }, 80);
   }
 
   if (document.body) {

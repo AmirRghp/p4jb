@@ -9,7 +9,7 @@
 - **Style:** Dark, high-contrast, TV-centric console utility interface.
 - **Mood:** Technical, direct, retro-console dashboard designed for viewing from a couch on a television screen via the PS4 browser.
 - **Design Principles:**
-  - High contrast white text with dark drop shadows over a looping full-screen background video (`public/assets/aistudio/Tanin1080p_b1930797.webm` VP9 + `public/assets/aistudio/tanin-bg.mp4` H.264 fallback + `public/assets/aistudio/tanin-poster.jpg` first-frame poster, with solid dark `#0a0c12` fallback and a subtle dark scrim `.p4jb-bg-scrim` for readability).
+  - High contrast white text with dark drop shadows over a looping full-screen animated background (`public/assets/aistudio/Tanin1080p_b1930797.webm` VP9 + `public/assets/aistudio/tanin-bg.mp4` H.264 online video, `public/assets/aistudio/tanin-bg.gif` offline AppCache fallback, and `public/assets/aistudio/tanin-poster.jpg` first-frame poster, with solid dark `#0a0c12` fallback and a subtle dark scrim `.p4jb-bg-scrim` for readability).
   - Large, uniform rectangular hit targets optimized for DualShock 4 analog-stick cursor navigation.
   - Zero external font or icon network dependencies so the entire UI renders identically offline.
   - Immediate single-line status feedback (`#msgs`) on button hover and exploit progress.
@@ -20,7 +20,7 @@
 
 - **Current Baseline Name:** `PS4 Exploit Host by GamerHack` (to be updated when `p4jb` custom branding is applied).
 - **Logo / Imagery:**
-  - `public/assets/aistudio/Tanin1080p_b1930797.webm` (1080p VP9, audio-stripped), `public/assets/aistudio/tanin-bg.mp4` (720p H.264 `+faststart` fallback for Safari/PS4 WebKit), and `public/assets/aistudio/tanin-poster.jpg` (720p first-frame poster) — Full-viewport fixed looping background layer injected across root and all sub-hosts via `bg-video.js` and `style.css` (`#p4jb-bg-layer`, `#p4jb-bg-video`, `.p4jb-bg-scrim`), featuring PS4 MP4 prioritization, `XHR -> Blob URL` offline AppCache playback with direct URL fallback, `visibilitychange` pause/resume, and `prefers-reduced-motion` support.
+  - `public/assets/aistudio/Tanin1080p_b1930797.webm` (1080p VP9, audio-stripped), `public/assets/aistudio/tanin-bg.mp4` (720p H.264 `+faststart` for online Safari/PS4 WebKit), `public/assets/aistudio/tanin-bg.gif` (560x315 32-frame optimized animated GIF cached in AppCache for offline PS4 playback), and `public/assets/aistudio/tanin-poster.jpg` (720p first-frame poster) — Full-viewport fixed looping background layer injected across root and all sub-hosts via `bg-video.js` and `style.css` (`#p4jb-bg-layer`, `#p4jb-bg-video`, `.p4jb-bg-scrim`), featuring hybrid online `<video>` / offline GIF fallback (`navigator.onLine`, `error`, and 2.5s readiness watchdog), `visibilitychange` pause/resume, and `prefers-reduced-motion` support.
   - `btc.jpg`, `eth.jpg` — `150px × 150px` QR code images inside `#crypto` on `index.html`.
 - **Brand Voice:** Concise, imperative, console-status messaging (e.g., `"Select Your Firmware"`, `"Loading GoldHEN v2.4b18.14... Please Wait"`, `"Cache Installed Successfully ✔"`).
 

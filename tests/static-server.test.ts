@@ -118,6 +118,11 @@ test('static handler serves root, assets, manifests, binaries, video ranges, ETa
     const posterEtag = posterRes.headers.get('etag');
     assert.ok(posterEtag);
 
+    const gifRes = await fetch(`${baseUrl}/public/assets/aistudio/tanin-bg.gif`, { method: 'HEAD' });
+    assert.equal(gifRes.status, 200);
+    assert.equal(gifRes.headers.get('content-type'), 'image/gif');
+    assert.equal(gifRes.headers.get('cache-control'), 'public, max-age=3600');
+
     const conditionalRes = await fetch(`${baseUrl}/public/assets/aistudio/tanin-poster.jpg`, {
       headers: { 'If-None-Match': posterEtag },
     });
@@ -171,21 +176,21 @@ test('static handler serves root, assets, manifests, binaries, video ranges, ETa
   });
 });
 
-test('bg-video.js remains ES5-compatible and supports PS4 offline Blob playback', () => {
+test('bg-video.js remains ES5-compatible and supports PS4 hybrid MP4/offline GIF fallback', () => {
   const bgVideo = fs.readFileSync(path.join(ROOT_DIR, 'bg-video.js'), 'utf8');
   new vm.Script(bgVideo);
   const codeWithoutComments = bgVideo.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '');
   assert.doesNotMatch(codeWithoutComments, /\b(const|let|class|async|await)\b/);
   assert.doesNotMatch(codeWithoutComments, /=>|`|\bpointerdown\b/);
   assert.match(bgVideo, /PlayStation 4/);
-  assert.match(bgVideo, /XMLHttpRequest/);
-  assert.match(bgVideo, /createObjectURL/);
+  assert.match(bgVideo, /tanin-bg\.gif/);
+  assert.match(bgVideo, /navigator\.onLine/);
   assert.match(bgVideo, /'click'/);
   assert.match(bgVideo, /'mousedown'/);
   assert.match(bgVideo, /'touchstart'/);
 });
 
-test('all offline manifests list existing local assets and bg-video assets', () => {
+test('all offline manifests list existing local assets and bg-video GIF/poster assets', () => {
   const manifests = [
     '505/cache.manifest',
     '672/cache.manifest',
@@ -203,7 +208,7 @@ test('all offline manifests list existing local assets and bg-video assets', () 
     const manifestDir = path.dirname(manifestPath);
     const content = fs.readFileSync(manifestPath, 'utf8');
     assert.match(content, /\.\.\/bg-video\.js/);
-    assert.match(content, /\.\.\/public\/assets\/aistudio\/tanin-bg\.mp4/);
+    assert.match(content, /\.\.\/public\/assets\/aistudio\/tanin-bg\.gif/);
     assert.match(content, /\.\.\/public\/assets\/aistudio\/tanin-poster\.jpg/);
     let inNetwork = false;
     for (const rawLine of content.split(/\r?\n/)) {
