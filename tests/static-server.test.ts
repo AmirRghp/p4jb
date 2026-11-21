@@ -79,7 +79,7 @@ test('static handler serves root, assets, manifests, binaries, video ranges, ETa
     assert.equal(rootRes.headers.get('cache-control'), 'no-cache');
     assert.ok(rootRes.headers.get('etag'));
     const rootHtml = await rootRes.text();
-    assert.match(rootHtml, /PS4\s+Exploit Host by GamerHack/);
+    assert.match(rootHtml, /PS4\s+Exploit Host by TANIN/);
 
     const cssRes = await fetch(`${baseUrl}/style.css`);
     assert.equal(cssRes.status, 200);
