@@ -7,6 +7,10 @@ All notable changes to `p4jb` will be documented in this file.
 ## [Unreleased]
 
 ### Changed
+- Switched `bg-video.js` and all 10 `*.manifest` files (`# bg-video v6`) to a hybrid online/offline background architecture for PS4 WebKit:
+  - Generated optimized `public/assets/aistudio/tanin-bg.gif` (`560x315`, 32 frames, `~1.6 MB`) from `Tanin1080p_b1930797.webm` and cached `tanin-bg.gif` + `tanin-poster.jpg` in all 10 `*.manifest` files (replacing unplayable-offline `.webm`/`.mp4` AppCache entries).
+  - Updated `bg-video.js` to serve direct `<video>` when online (`tanin-bg.mp4` on PS4, `.webm`/`.mp4` on desktop) and automatically fall back to `tanin-bg.gif` when `navigator.onLine === false`, on `<video>` `error`, or if `<video>` fails to buffer within `2500ms` (covering offline fake-DNS PS4 setups).
+  - Added `.gif` static server response test and hybrid/manifest assertions in `tests/static-server.test.ts`.
 - Updated `bg-video.js`, `style.css`, and all 10 `*.manifest` files (`# bg-video v5`) for PS4 WebKit compatibility and offline AppCache playback across all hosts including `g2all/`:
   - Forced `tanin-bg.mp4` (`H.264 Main L3.1`) priority on `PlayStation 4` User-Agents and added `XMLHttpRequest -> Blob URL` (`URL.createObjectURL` / `webkitURL`) loading with automatic direct-URL fallback so `<video>` plays from AppCache offline without `206 Partial Content` failures.
   - Deferred async video XHR (`80ms`) to avoid competing with exploit bootstrap scripts on `g2all/` and legacy firmware pages.
