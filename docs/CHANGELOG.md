@@ -7,6 +7,11 @@ All notable changes to `p4jb` will be documented in this file.
 ## [Unreleased]
 
 ### Changed
+- Updated `bg-video.js`, `style.css`, and all 10 `*.manifest` files (`# bg-video v5`) for PS4 WebKit compatibility and offline AppCache playback across all hosts including `g2all/`:
+  - Forced `tanin-bg.mp4` (`H.264 Main L3.1`) priority on `PlayStation 4` User-Agents and added `XMLHttpRequest -> Blob URL` (`URL.createObjectURL` / `webkitURL`) loading with automatic direct-URL fallback so `<video>` plays from AppCache offline without `206 Partial Content` failures.
+  - Deferred async video XHR (`80ms`) to avoid competing with exploit bootstrap scripts on `g2all/` and legacy firmware pages.
+  - Replaced unsupported `pointerdown` with `click`/`mousedown`/`touchstart`/`keydown` gesture recovery (keeping listeners active until playback starts) and removed `contain: strict` and initial `opacity: 0` on `#p4jb-bg-video` in `style.css`.
+  - Added ES5 syntax/PS4-compat and manifest integrity tests in `tests/static-server.test.ts`.
 - Synced upstream `GamerHack/GamerHack.github.io` (`upstream/main` @ `52edf4c`) into `p4jb` via `upstream-main`, preserving all `TANIN` branding and local customizations, and updated `tests/static-server.test.ts` root title assertion to match `TANIN`.
 - Optimized background video delivery, decoding, and playback without modifying core exploit files:
   - Re-encoded `public/assets/aistudio/Tanin1080p_b1930797.webm` (2-pass 1080p VP9 CRF 37, GOP 24, stripped unused audio stream: reduced from `2.0 MB` to `1.04 MB`), generated `public/assets/aistudio/tanin-bg.mp4` (`758 KB` 720p H.264 Main `+faststart` fallback for Safari/PS4 WebKit), and generated `public/assets/aistudio/tanin-poster.jpg` (`55 KB` 720p frame-0 poster).

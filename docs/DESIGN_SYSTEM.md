@@ -20,7 +20,7 @@
 
 - **Current Baseline Name:** `PS4 Exploit Host by GamerHack` (to be updated when `p4jb` custom branding is applied).
 - **Logo / Imagery:**
-  - `public/assets/aistudio/Tanin1080p_b1930797.webm` (1080p VP9, audio-stripped), `public/assets/aistudio/tanin-bg.mp4` (720p H.264 `+faststart` fallback for Safari/PS4 WebKit), and `public/assets/aistudio/tanin-poster.jpg` (720p first-frame poster) — Full-viewport fixed looping background layer injected across root and all sub-hosts via `bg-video.js` and `style.css` (`#p4jb-bg-layer`, `#p4jb-bg-video`, `.p4jb-bg-scrim`), featuring `canPlayType` codec selection, GPU layer isolation (`translateZ(0)`, `contain: strict`), smooth opacity reveal, `visibilitychange` pause/resume, and `prefers-reduced-motion` support.
+  - `public/assets/aistudio/Tanin1080p_b1930797.webm` (1080p VP9, audio-stripped), `public/assets/aistudio/tanin-bg.mp4` (720p H.264 `+faststart` fallback for Safari/PS4 WebKit), and `public/assets/aistudio/tanin-poster.jpg` (720p first-frame poster) — Full-viewport fixed looping background layer injected across root and all sub-hosts via `bg-video.js` and `style.css` (`#p4jb-bg-layer`, `#p4jb-bg-video`, `.p4jb-bg-scrim`), featuring PS4 MP4 prioritization, `XHR -> Blob URL` offline AppCache playback with direct URL fallback, `visibilitychange` pause/resume, and `prefers-reduced-motion` support.
   - `btc.jpg`, `eth.jpg` — `150px × 150px` QR code images inside `#crypto` on `index.html`.
 - **Brand Voice:** Concise, imperative, console-status messaging (e.g., `"Select Your Firmware"`, `"Loading GoldHEN v2.4b18.14... Please Wait"`, `"Cache Installed Successfully ✔"`).
 
