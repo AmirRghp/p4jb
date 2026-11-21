@@ -7,6 +7,7 @@ All notable changes to `p4jb` will be documented in this file.
 ## [Unreleased]
 
 ### Changed
+- Synced upstream `GamerHack/GamerHack.github.io` (`upstream/main` @ `52edf4c`) into `p4jb` via `upstream-main`, preserving all `TANIN` branding and local customizations, and updated `tests/static-server.test.ts` root title assertion to match `TANIN`.
 - Optimized background video delivery, decoding, and playback without modifying core exploit files:
   - Re-encoded `public/assets/aistudio/Tanin1080p_b1930797.webm` (2-pass 1080p VP9 CRF 37, GOP 24, stripped unused audio stream: reduced from `2.0 MB` to `1.04 MB`), generated `public/assets/aistudio/tanin-bg.mp4` (`758 KB` 720p H.264 Main `+faststart` fallback for Safari/PS4 WebKit), and generated `public/assets/aistudio/tanin-poster.jpg` (`55 KB` 720p frame-0 poster).
   - Upgraded `bg-video.js` (ES5) with `canPlayType` codec selection, runtime source fallback to poster background, GPU/smooth opacity reveal (`is-ready`), `visibilitychange`/`pagehide` pause-resume, `prefers-reduced-motion` support, PiP/remote-playback suppression, and gesture autoplay retry.
