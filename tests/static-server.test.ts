@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
+import vm from 'node:vm';
 import type { AddressInfo } from 'node:net';
 import { buildEtag, createStaticHandler, getCacheControl, getMimeType, parseRangeHeader, resolveSafePath } from '../lib/static-server.ts';
 
@@ -167,4 +169,57 @@ test('static handler serves root, assets, manifests, binaries, video ranges, ETa
     });
     assert.equal(malformedStatus, 403);
   });
+});
+
+test('bg-video.js remains ES5-compatible and supports PS4 offline Blob playback', () => {
+  const bgVideo = fs.readFileSync(path.join(ROOT_DIR, 'bg-video.js'), 'utf8');
+  new vm.Script(bgVideo);
+  const codeWithoutComments = bgVideo.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '');
+  assert.doesNotMatch(codeWithoutComments, /\b(const|let|class|async|await)\b/);
+  assert.doesNotMatch(codeWithoutComments, /=>|`|\bpointerdown\b/);
+  assert.match(bgVideo, /PlayStation 4/);
+  assert.match(bgVideo, /XMLHttpRequest/);
+  assert.match(bgVideo, /createObjectURL/);
+  assert.match(bgVideo, /'click'/);
+  assert.match(bgVideo, /'mousedown'/);
+  assert.match(bgVideo, /'touchstart'/);
+});
+
+test('all offline manifests list existing local assets and bg-video assets', () => {
+  const manifests = [
+    '505/cache.manifest',
+    '672/cache.manifest',
+    '672goldhen/cache.manifest',
+    '900goldhen/cache.manifest',
+    '900v3/cache.manifest',
+    'g2all/505.manifest',
+    'g2all/700.manifest',
+    'g2all/900.manifest',
+    'g2all/css.manifest',
+    'g2all/slopkit.manifest',
+  ];
+  for (const manifestRel of manifests) {
+    const manifestPath = path.join(ROOT_DIR, manifestRel);
+    const manifestDir = path.dirname(manifestPath);
+    const content = fs.readFileSync(manifestPath, 'utf8');
+    assert.match(content, /\.\.\/bg-video\.js/);
+    assert.match(content, /\.\.\/public\/assets\/aistudio\/tanin-bg\.mp4/);
+    assert.match(content, /\.\.\/public\/assets\/aistudio\/tanin-poster\.jpg/);
+    let inNetwork = false;
+    for (const rawLine of content.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#') || line === 'CACHE MANIFEST' || line === 'CACHE:') {
+        inNetwork = false;
+        continue;
+      }
+      if (line === 'NETWORK:' || line === 'FALLBACK:') {
+        inNetwork = true;
+        continue;
+      }
+      if (inNetwork || line === '*') continue;
+      const cleanRel = line.split('?')[0].replace(/\\/g, '/');
+      const resolved = path.resolve(manifestDir, cleanRel);
+      assert.ok(fs.existsSync(resolved), `Missing manifest asset: ${manifestRel} -> ${line}`);
+    }
+  }
 });
