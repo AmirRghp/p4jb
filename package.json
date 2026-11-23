@@ -8,6 +8,7 @@
     "start": "node server.ts",
     "build": "node --check server.ts && node --check lib/static-server.ts && node --check tests/static-server.test.ts",
     "lint": "node --check server.ts && node --check lib/static-server.ts && node --test tests/static-server.test.ts",
-    "test": "node --test tests/static-server.test.ts"
+    "test": "node --test tests/static-server.test.ts",
+    "check-upstream": "node scripts/check-upstream.js"
   }
 }
