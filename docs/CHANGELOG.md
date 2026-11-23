@@ -6,6 +6,9 @@ All notable changes to `p4jb` will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- Configured production deployment target `https://github.com/taninbabol1/taninbabol1.github.io` (live at `https://taninbabol1.github.io/`) and updated project documentation for multi-maintainer handoff.
+
 ### Changed
 - Switched `bg-video.js` and all 10 `*.manifest` files (`# bg-video v6`) to a hybrid online/offline background architecture for PS4 WebKit:
   - Generated optimized `public/assets/aistudio/tanin-bg.gif` (`560x315`, 32 frames, `~1.6 MB`) from `Tanin1080p_b1930797.webm` and cached `tanin-bg.gif` + `tanin-poster.jpg` in all 10 `*.manifest` files (replacing unplayable-offline `.webm`/`.mp4` AppCache entries).

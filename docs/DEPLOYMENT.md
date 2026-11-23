@@ -1,6 +1,6 @@
 # Deployment & Git Release Runbook
 
-> **Baseline Notice:** `p4jb` is deployed as static files (GitHub Pages or local LAN HTTP server) from the `main` branch of `AmirRghp/p4jb`.
+> **Baseline Notice:** `p4jb` is deployed as static files (GitHub Pages or local LAN HTTP server) from the `main` branch of `taninbabol1/taninbabol1.github.io` (formerly `AmirRghp/p4jb`).
 
 ---
 
@@ -9,7 +9,8 @@
 - **Local Development / LAN Testing:**
   - Served locally over HTTP (e.g., `http://localhost:8080` or `http://<LAN-IP>:8080` for PS4 console testing).
 - **Production (GitHub Pages):**
-  - Repository: `git@github.com:AmirRghp/p4jb.git`
+  - Repository: `git@github.com:taninbabol1/taninbabol1.github.io.git`
+  - URL: `https://taninbabol1.github.io/`
   - Source branch: `main` (root `/` folder)
   - Upstream reference: `https://github.com/GamerHack/GamerHack.github.io.git`
 

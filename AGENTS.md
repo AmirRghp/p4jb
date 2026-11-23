@@ -8,7 +8,7 @@
 
 **Primary Users:**
 - PS4 console owners accessing the host via the PS4 WebKit Browser (online for initial cache installation, then offline).
-- The repository maintainer (`AmirRghp`) customizing UI, branding, payload selection, and firmware support on top of upstream updates.
+- The repository maintainer (`TANIN` / `taninbabol1`) customizing UI, branding, payload selection, and firmware support on top of upstream updates.
 
 ---
 
@@ -33,13 +33,14 @@ Do not contradict these documents without first identifying the conflict and ask
 
 ## 3. Git & Branching Rules (Mandatory)
 
-This repository tracks both the personal fork (`origin`) and the upstream project (`upstream`). Every agent must respect the branch topology:
+This repository tracks both the production repository (`origin`) and the upstream project (`upstream`). Every agent must respect the branch topology:
 
 | Branch / Remote | Purpose | Agent Rule |
 | :--- | :--- | :--- |
-| `origin` (`git@github.com:AmirRghp/p4jb.git`) | Personal fork repository | Push only when explicitly asked or when completing a requested release |
+| `origin` (`git@github.com:taninbabol1/taninbabol1.github.io.git`) | Production repository | Push only when explicitly asked or when completing a requested release |
 | `upstream` (`https://github.com/GamerHack/GamerHack.github.io.git`) | Upstream source repository | Fetch only; never push |
-| `main` | Personal stable / production branch | Merge tested `feat/*`, `fix/*`, `style/*`, `docs/*` branches here |
+| `backup` (`git@github.com:AmirRghp/p4jb.git`) | Personal fork/backup repository | Optional mirror |
+| `main` | Production stable branch | Merge tested `feat/*`, `fix/*`, `style/*`, `docs/*` branches here |
 | `upstream-main` | Clean read-only mirror of `upstream/main` | **NEVER** commit custom changes to `upstream-main` |
 | `feat/*`, `fix/*`, `style/*`, `docs/*` | Short-lived working branches created from `main` | Do feature/customization work here, then merge into `main` |
 

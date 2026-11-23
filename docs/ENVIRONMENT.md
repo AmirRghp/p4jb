@@ -38,8 +38,9 @@ This repository is configured as a personal fork tracking upstream exploit updat
 ### Configured Remotes
 | Remote | URL | Role |
 | :--- | :--- | :--- |
-| `origin` | `git@github.com:AmirRghp/p4jb.git` | Personal fork repository (read/write) |
+| `origin` | `git@github.com:taninbabol1/taninbabol1.github.io.git` | Primary production repository (read/write) |
 | `upstream` | `https://github.com/GamerHack/GamerHack.github.io.git` | Upstream source repository (read-only fetch) |
+| `backup` | `git@github.com:AmirRghp/p4jb.git` | Personal fork/backup repository |
 
 ### Configured Branches
 | Branch | Tracks | Purpose | Write Policy |

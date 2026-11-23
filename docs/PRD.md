@@ -52,8 +52,8 @@ Users either rely on public third-party hosts (such as `gamerhack.github.io` or 
   - Confusion about when to close the browser and disable internet during cache installation.
   - Broken or incomplete offline caches if manifests omit files.
 
-### User Type 2 — Fork Maintainer (`AmirRghp`)
-- **Description:** The developer customizing `p4jb` for personal use (branding, theme/UI tweaks, payload curation, or localization) while tracking upstream exploit fixes.
+### User Type 2 — Repository Maintainer (`taninbabol1` / `AmirRghp`)
+- **Description:** The developer maintaining `taninbabol1.github.io` (branding, theme/UI tweaks, payload curation, or localization) while tracking upstream exploit fixes.
 - **Needs:**
   - Clear separation between UI/branding customizations and low-level exploit engines.
   - Explicit Git branching and upstream-sync procedures.
